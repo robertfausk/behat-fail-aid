@@ -1,9 +1,11 @@
-FROM forceedge01/php56cli-composer:latest
+ARG PHP_VERSION=8.2
+FROM php:${PHP_VERSION}-cli
 
-WORKDIR '/app'
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /app
 COPY . .
-RUN rm composer.lock
-RUN composer self-update
-RUN composer install
 
-CMD ["composer", "run-script", "tests"]
+RUN composer install --no-interaction --prefer-dist
+
+CMD ["composer", "tests"]
