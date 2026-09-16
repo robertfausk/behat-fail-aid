@@ -729,7 +729,6 @@ class FailureContextTest extends PHPUnit_Framework_TestCase
     private function getPrivatePropertyValue($property)
     {
         $reflectionProperty = new ReflectionProperty(get_class($this->testObject), $property);
-        $reflectionProperty->setAccessible(true);
 
         return $reflectionProperty->getValue($this->testObject);
     }
@@ -738,7 +737,6 @@ class FailureContextTest extends PHPUnit_Framework_TestCase
     {
         $reflector = new ReflectionObject($this->testObject);
         $method = $reflector->getMethod($method);
-        $method->setAccessible(true);
 
         return $method->invokeArgs($this->testObject, $params);
     }
@@ -768,7 +766,6 @@ class FailureContextTest extends PHPUnit_Framework_TestCase
     private function setPrivatePropertyValue($property, $value)
     {
         $reflectionProperty = new ReflectionProperty(get_class($this->testObject), $property);
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($this->testObject, $value);
 
         return $this;
@@ -777,7 +774,6 @@ class FailureContextTest extends PHPUnit_Framework_TestCase
     private function setObjectPrivatePropertyValue($object, $property, $value)
     {
         $reflectionProperty = new ReflectionProperty(get_class($object), $property);
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($object, $value);
 
         return $this;

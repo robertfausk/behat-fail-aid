@@ -5,10 +5,11 @@
   "license": "MIT",
   "authors": [
     {
-      "name": "Abdul Wahhab Qureshi"
+      "name": "Robert Freigang"
     }
   ],
   "require": {
+    "php": ">=8.2",
     "behat/behat": "^3.5 || ^4.0",
     "behat/mink": "*@stable",
     "behat/mink-extension": "^2.0 || ^3.0",

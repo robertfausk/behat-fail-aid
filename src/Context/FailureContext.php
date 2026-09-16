@@ -656,7 +656,6 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     {
         $reflectionObject = new ReflectionObject($exception);
         $reflectionObjectProp = $reflectionObject->getProperty('message');
-        $reflectionObjectProp->setAccessible(true);
         $reflectionObjectProp->setValue($exception, $exception->getMessage() . $message);
     }
 }
