@@ -332,3 +332,52 @@ class FeatureContext
 }
 
 ```
+
+Development
+-----------
+
+### Requirements
+
+- Docker and Docker Compose
+
+### Running the test suite locally
+
+All tests (PHPUnit unit tests + Behat integration tests) run inside Docker containers:
+
+```shell
+# Run all tests on all supported PHP versions (8.2–8.5)
+make tests
+
+# Run only PHPUnit unit tests on PHP 8.2
+make tests-unit
+
+# Run only Behat integration tests on PHP 8.2
+make tests-behat
+```
+
+Or target a specific PHP version:
+
+```shell
+docker compose run --rm php8.3 ./bin/run-tests.sh
+docker compose run --rm php8.4 ./vendor/bin/phpunit -c tests
+docker compose run --rm php8.5 ./vendor/bin/behat
+```
+
+### Supported versions
+
+| PHP    | Behat  | Status      |
+|--------|--------|-------------|
+| 8.2    | ^3.5   | supported   |
+| 8.2    | ^4.0   | supported   |
+| 8.3    | ^3.5   | supported   |
+| 8.3    | ^4.0   | supported   |
+| 8.4    | ^3.5   | supported   |
+| 8.4    | ^4.0   | supported   |
+| 8.5    | ^3.5   | supported   |
+| 8.5    | ^4.0   | supported   |
+| 8.6    | ^3.5   | experimental (nightly) |
+| 8.6    | ^4.0   | experimental (nightly) |
+
+### CI
+
+GitHub Actions runs the full matrix on every push and pull request. See `.github/workflows/ci-tests.yaml`.
