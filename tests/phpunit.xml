@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <phpunit colors="true">
     <testsuites>
-        <testsuite name="Genesis Behat Fail Aid">
+        <testsuite name="Behat Fail Aid">
             <directory>./bootstrap</directory>
         </testsuite>
     </testsuites>
