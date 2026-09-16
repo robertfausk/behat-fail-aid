@@ -1,14 +1,4 @@
 services:
-  php8.2:
-    build:
-      dockerfile: Dockerfile
-      context: .
-      args:
-        PHP_VERSION: 8.2
-    volumes:
-      - ./:/app
-      - /app/vendor
-
   php8.3:
     build:
       dockerfile: Dockerfile

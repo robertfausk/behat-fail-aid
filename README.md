@@ -342,20 +342,20 @@ Development
 
 ### Running the test suite locally
 
-All tests (PHPUnit unit tests + Behat integration tests) run inside Docker containers:
+The full matrix (3 PHP versions × 2 Behat scenarios) runs via isolated Docker builds:
 
 ```shell
-# Run all tests on all supported PHP versions (8.2–8.5)
+# Run all 6 combinations (PHP 8.3–8.5 × behat3/behat4)
 make tests
 
-# Run only PHPUnit unit tests on PHP 8.2
+# Quick iteration: PHPUnit unit tests on PHP 8.3 with default deps
 make tests-unit
 
-# Run only Behat integration tests on PHP 8.2
+# Quick iteration: Behat integration tests on PHP 8.3
 make tests-behat
 ```
 
-Or target a specific PHP version:
+For fast dev iteration against a single PHP version (uses volume mount, no rebuild needed):
 
 ```shell
 docker compose run --rm php8.3 ./bin/run-tests.sh
@@ -363,20 +363,29 @@ docker compose run --rm php8.4 ./vendor/bin/phpunit -c tests
 docker compose run --rm php8.5 ./vendor/bin/behat
 ```
 
+### Dependency scenarios
+
+Dependency matrices are managed with [g1a/composer-test-scenarios](https://github.com/g1a/composer-test-scenarios).
+Scenario lock files live in `.scenarios.lock/` and are committed to the repository.
+
+To regenerate after changing `composer.json`:
+
+```shell
+make scenarios-update
+```
+
 ### Supported versions
 
-| PHP    | Behat  | Status      |
-|--------|--------|-------------|
-| 8.2    | ^3.5   | supported   |
-| 8.2    | ^4.0   | supported   |
-| 8.3    | ^3.5   | supported   |
-| 8.3    | ^4.0   | supported   |
-| 8.4    | ^3.5   | supported   |
-| 8.4    | ^4.0   | supported   |
-| 8.5    | ^3.5   | supported   |
-| 8.5    | ^4.0   | supported   |
-| 8.6    | ^3.5   | experimental (nightly) |
-| 8.6    | ^4.0   | experimental (nightly) |
+| PHP    | Behat scenario | Status                  |
+|--------|----------------|-------------------------|
+| 8.3    | behat3 (^3.5)  | supported               |
+| 8.3    | behat4 (^4.0)  | supported               |
+| 8.4    | behat3 (^3.5)  | supported               |
+| 8.4    | behat4 (^4.0)  | supported               |
+| 8.5    | behat3 (^3.5)  | supported               |
+| 8.5    | behat4 (^4.0)  | supported               |
+| 8.6    | behat3 (^3.5)  | experimental (nightly)  |
+| 8.6    | behat4 (^4.0)  | experimental (nightly)  |
 
 ### CI
 
