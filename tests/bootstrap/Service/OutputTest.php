@@ -6,9 +6,9 @@ use Behat\Behat\Hook\Scope\ScenarioScope;
 use Behat\Gherkin\Node\ScenarioInterface;
 use Behat\Mink\Driver\DriverInterface;
 use FailAid\Service\Output;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class OutputTest extends PHPUnit_Framework_TestCase
+class OutputTest extends TestCase
 {
     public function testProvideDiff()
     {

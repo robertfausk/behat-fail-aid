@@ -6,9 +6,9 @@ use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\Mink\Session;
 use Exception;
 use FailAid\Service\JSDebug;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class JSDebugTest extends PHPUnit_Framework_TestCase
+class JSDebugTest extends TestCase
 {
     public function testGetJsLogs()
     {

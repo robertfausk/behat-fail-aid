@@ -34,7 +34,7 @@ use FailAid\Service\JSDebug;
 use FailAid\Service\Output;
 use FailAid\Service\Screenshot;
 use FailAid\Service\StaticCallerService;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionObject;
 use ReflectionProperty;
@@ -58,7 +58,7 @@ class FailedStep implements ExceptionResult, StepResult
     }
 }
 
-class FailureContextTest extends PHPUnit_Framework_TestCase
+class FailureContextTest extends TestCase
 {
     /**
      * @var FailreContextInterface The object to be tested.
@@ -83,7 +83,7 @@ class FailureContextTest extends PHPUnit_Framework_TestCase
     /**
      * Set up the testing object.
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->dependencies = [
             'staticCallerMock' => $this->getMockBuilder(StaticCallerService::class)->getMock()

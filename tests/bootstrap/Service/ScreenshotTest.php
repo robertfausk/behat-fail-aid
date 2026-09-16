@@ -14,14 +14,14 @@ use Behat\Mink\Element\Element;
 use Behat\Mink\Exception\DriverException;
 use Exception;
 use FailAid\Service\Screenshot;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group screenshotTests
  */
-class ScreenshotTest extends PHPUnit_Framework_TestCase
+class ScreenshotTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         Screenshot::setOptions([
             'hostDirectory' => null,
