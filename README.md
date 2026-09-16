@@ -1,5 +1,12 @@
-Behat Fail Aid ![Master branch](https://github.com/robertfausk/behat-fail-aid/actions/workflows/ci-tests.yaml/badge.svg?branch=master) [![Latest Stable Version](https://poser.pugx.org/robertfausk/behat-fail-aid/v/stable)](https://packagist.org/packages/robertfausk/behat-fail-aid) [![Total Downloads](https://poser.pugx.org/robertfausk/behat-fail-aid/downloads)](https://packagist.org/packages/robertfausk/behat-fail-aid) [![License](https://poser.pugx.org/robertfausk/behat-fail-aid/license)](https://packagist.org/packages/robertfausk/behat-fail-aid) [![Monthly Downloads](https://poser.pugx.org/robertfausk/behat-fail-aid/d/monthly)](https://packagist.org/packages/robertfausk/behat-fail-aid) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=robertfausk_behat-fail-aid&metric=alert_status)](https://sonarcloud.io/dashboard?id=robertfausk_behat-fail-aid) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=robertfausk_behat-fail-aid&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=robertfausk_behat-fail-aid) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=robertfausk_behat-fail-aid&metric=security_rating)](https://sonarcloud.io/dashboard?id=robertfausk_behat-fail-aid)
-=======
+Behat Fail Aid
+
+[![CI](https://github.com/robertfausk/behat-fail-aid/actions/workflows/ci-tests.yaml/badge.svg?branch=main)](https://github.com/robertfausk/behat-fail-aid/actions/workflows/ci-tests.yaml)
+[![Latest Stable Version](https://img.shields.io/packagist/v/robertfausk/behat-fail-aid)](https://packagist.org/packages/robertfausk/behat-fail-aid)
+[![Total Downloads](https://img.shields.io/packagist/dt/robertfausk/behat-fail-aid)](https://packagist.org/packages/robertfausk/behat-fail-aid)
+[![Monthly Downloads](https://img.shields.io/packagist/dm/robertfausk/behat-fail-aid)](https://packagist.org/packages/robertfausk/behat-fail-aid)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE.md)
+[![PHP](https://img.shields.io/badge/php-%3E%3D8.3-8892BF)](https://www.php.net/)
+[![Behat](https://img.shields.io/badge/behat-3.5%20%7C%204.0-green)](https://behat.org/)
 
 Upgrading?
 ----------
