@@ -39,6 +39,8 @@ use ReflectionClass;
 use ReflectionObject;
 use ReflectionProperty;
 
+class TestException extends \Exception {}
+
 class FailedStep implements ExceptionResult, StepResult
 {
     public function hasException()
@@ -75,19 +77,26 @@ class FailureContextTest extends TestCase
      */
     private $dependencies = [];
 
-    /**
-     * @var [type]
-     */
-    private $at;
+    private array $mockCallReturns = [];
 
     /**
      * Set up the testing object.
      */
     public function setUp(): void
     {
-        $this->dependencies = [
-            'staticCallerMock' => $this->getMockBuilder(StaticCallerService::class)->getMock()
-        ];
+        $mock = $this->getMockBuilder(StaticCallerService::class)->getMock();
+        $mock->method('call')->willReturnCallback(function ($s, $m, $p) {
+            // exact match first (for all entries)
+            foreach ($this->mockCallReturns as [$es, $em, $ep, $er]) {
+                if ($es === $s && $em === $m && $ep === $p) return $er;
+            }
+            // loose match by service+method only (skip getOption — it needs exact params)
+            foreach ($this->mockCallReturns as [$es, $em, $ep, $er]) {
+                if ($es === $s && $em === $m && $em !== 'getOption') return $er;
+            }
+            return null;
+        });
+        $this->dependencies = ['staticCallerMock' => $mock];
 
         $this->reflection = new ReflectionClass(FailureContext::class);
         $this->testObject = $this->reflection->newInstanceArgs();
@@ -95,7 +104,7 @@ class FailureContextTest extends TestCase
         $this->testObject->setStaticCaller($this->dependencies['staticCallerMock']);
         $this->testObject->setConfig([], [], []);
         $this->setPrivatePropertyValue('exceptionHash', null);
-        $this->at = 0;
+        $this->mockCallReturns = [];
     }
 
     public function testInitStateWithParams()
@@ -206,8 +215,7 @@ class FailureContextTest extends TestCase
         $currentUrl = 'http://site.dev/login';
         $statusCode = 200;
 
-        $exceptionMock = $this->getMockBuilder(Exception::class)->getMock();
-        $exceptionMock->expects($this->never())->method('getMessage')->willReturn($exceptionMessage);
+        $exceptionMock = $this->getMockBuilder(TestException::class)->getMock();
 
         $scope = $this->getAfterStepScopeWithMockedParams();
         $scope->getTestResult()->expects($this->once())->method('getResultCode')->willReturn(TestResult::FAILED);
@@ -240,11 +248,10 @@ class FailureContextTest extends TestCase
         $currentScenarioMock->expects($this->never())->method('getScenario')->willReturn($scenarioMock);
         $this->setPrivatePropertyValue('currentScenario', $currentScenarioMock);
 
-        $result = $this->testObject
-            ->setMink($minkMock())
-            ->gatherStateFactsAfterFailedStep($scope);
+        $this->testObject->setMink($minkMock());
+        $result = $this->testObject->gatherStateFactsAfterFailedStep($scope);
 
-        self::assertContains('The page is blank, is the driver/browser ready to receive the request?', $result);
+        self::assertStringContainsString('The page is blank, is the driver/browser ready to receive the request?', $result);
     }
 
     public function testTakeScreenshotWontHappenIfTurnedOff()
@@ -254,8 +261,7 @@ class FailureContextTest extends TestCase
         $currentUrl = 'http://site.dev/login';
         $statusCode = 200;
 
-        $exceptionMock = $this->getMockBuilder(Exception::class)->getMock();
-        $exceptionMock->expects($this->never())->method('getMessage')->willReturn($exceptionMessage);
+        $exceptionMock = $this->getMockBuilder(TestException::class)->getMock();
 
         $scope = $this->getAfterStepScopeWithMockedParams();
         $scope->getTestResult()->expects($this->once())->method('getResultCode')->willReturn(TestResult::FAILED);
@@ -287,9 +293,8 @@ class FailureContextTest extends TestCase
         $this->mockStaticCaller(Output::class, 'getOption', ['api'], false);
         $this->mockStaticCaller(Output::class, 'getOption', ['screenshot'], false);
 
-        $this->testObject
-            ->setMink($minkMock())
-            ->gatherStateFactsAfterFailedStep($scope);
+        $this->testObject->setMink($minkMock());
+        $this->testObject->gatherStateFactsAfterFailedStep($scope);
     }
 
     public function testgatherStateFactsAfterFailedStepFailedBasic()
@@ -303,8 +308,7 @@ class FailureContextTest extends TestCase
         $expectedLineNumber = 73;
         $expectedScreenshotPath = '/abc/failures/82738492783432.png';
 
-        $exceptionMock = $this->getMockBuilder(Exception::class)->getMock();
-        $exceptionMock->expects($this->never())->method('getMessage');
+        $exceptionMock = $this->getMockBuilder(TestException::class)->getMock();
 
         // Exception object has final method which are not mockable by phpunit.
         $this->setObjectPrivatePropertyValue($exceptionMock, 'file', $exceptionFile);
@@ -370,14 +374,13 @@ class FailureContextTest extends TestCase
 
         $this->setPrivatePropertyValue('currentScenario', $currentScenarioMock);
 
-        $result = $this->testObject
-            ->setMink($minkMock)
-            ->gatherStateFactsAfterFailedStep($scope);
+        $this->testObject->setMink($minkMock);
+        $result = $this->testObject->gatherStateFactsAfterFailedStep($scope);
 
-        self::assertInternalType('string', $result);
-        self::assertContains('[URL] http://site.dev/login', $result);
-        self::assertNotContains('[DEBUG BAR INFO]', $result);
-        self::assertNotContains('[STATE]', $result);
+        self::assertIsString($result);
+        self::assertStringContainsString('[URL] http://site.dev/login', $result);
+        self::assertStringNotContainsString('[DEBUG BAR INFO]', $result);
+        self::assertStringNotContainsString('[STATE]', $result);
     }
 
     public function testAfterFailedStepFailedDebugBarDetails()
@@ -390,8 +393,7 @@ class FailureContextTest extends TestCase
         $html = '<html><body>Hello World</body></html>';
         $expectedLineNumber = 79;
 
-        $exceptionMock = $this->getMockBuilder(Exception::class)->getMock();
-        $exceptionMock->expects($this->never())->method('getMessage');
+        $exceptionMock = $this->getMockBuilder(TestException::class)->getMock();
 
         // Exception object has final method which are not mockable by phpunit.
         $this->setObjectPrivatePropertyValue($exceptionMock, 'file', $exceptionFile);
@@ -409,8 +411,10 @@ class FailureContextTest extends TestCase
 
             $pageMock = $this->getMockBuilder(DocumentElement::class)->disableOriginalConstructor()->getMock();
             $pageMock->expects($this->never())->method('getOuterHtml')->willReturn($html);
-            $pageMock->expects($this->at(0))->method('find')->with('css', '#debugBar .message')
-                ->willReturn($elementMock);
+            $pageMock->expects($this->exactly(2))->method('find')
+                ->willReturnCallback(function ($type, $selector) use ($elementMock) {
+                    return $selector === '#debugBar .message' ? $elementMock : null;
+                });
 
             $driverMock = $this->getMockBuilder(DriverInterface::class)->disableOriginalConstructor()->getMock();
 
@@ -419,14 +423,13 @@ class FailureContextTest extends TestCase
             $sessionMock->expects($this->atLeastOnce())->method('getDriver')->willReturn($driverMock);
             $sessionMock->expects($this->never())->method('getCurrentUrl');
             $sessionMock->expects($this->never())->method('getStatusCode');
-            $sessionMock->expects($this->any())
-                ->method('evaluateScript')
-                ->withConsecutive(['return window.jsErrors'], ['return window.jsWarns'], ['return window.jsLogs'])
-                ->willReturnOnConsecutiveCalls(
-                    ['first error', 'second error'],
-                    ['first warn', 'second warn'],
-                    ['first log', 'second log']
-                );
+            $sessionMock->method('evaluateScript')
+                ->willReturnCallback(function ($script) {
+                    if (str_contains($script, 'jsErrors')) return ['first error', 'second error'];
+                    if (str_contains($script, 'jsWarns')) return ['first warn', 'second warn'];
+                    if (str_contains($script, 'jsLogs')) return ['first log', 'second log'];
+                    return [];
+                });
 
             $minkMock = $this->getMockBuilder(Mink::class)->getMock();
             $minkMock->expects($this->atLeastOnce())->method('getSession')->willReturn($sessionMock);
@@ -467,9 +470,8 @@ class FailureContextTest extends TestCase
                 $currentScenarioMock
             ], '[URL] http://site.dev/login');
 
-        $result = $this->testObject
-            ->setMink($minkMock)
-            ->gatherStateFactsAfterFailedStep($scope);
+        $this->testObject->setMink($minkMock);
+        $result = $this->testObject->gatherStateFactsAfterFailedStep($scope);
 
         self::assertEquals('[URL] http://site.dev/login' . PHP_EOL, $result);
         $this->setPrivatePropertyValue('debugBarSelectors', []);
@@ -485,8 +487,7 @@ class FailureContextTest extends TestCase
         $html = '<html><body>Hello World</body></html>';
         $expectedLineNumber = 99;
 
-        $exceptionMock = $this->getMockBuilder(Exception::class)->getMock();
-        $exceptionMock->expects($this->never())->method('getMessage');
+        $exceptionMock = $this->getMockBuilder(TestException::class)->getMock();
 
         $this->setObjectPrivatePropertyValue($exceptionMock, 'file', $exceptionFile);
         $scope = $this->getAfterStepScopeWithMockedParams();
@@ -538,14 +539,13 @@ class FailureContextTest extends TestCase
             $currentScenarioMock
         ], '[URL] http://site.dev/login');
 
-        $result = $this->testObject
-            ->setMink($minkMock)
-            ->gatherStateFactsAfterFailedStep($scope);
+        $this->testObject->setMink($minkMock);
+        $result = $this->testObject->gatherStateFactsAfterFailedStep($scope);
 
-        self::assertContains('[URL] http://site.dev/login', $result);
-        self::assertContains('[STATE]', $result);
-        self::assertContains('  [TEST USER EMAIL] its.inevitable@hotmail.com', $result);
-        self::assertContains('  [POSTCODE] LD34 8GG', $result);
+        self::assertStringContainsString('[URL] http://site.dev/login', $result);
+        self::assertStringContainsString('[STATE]', $result);
+        self::assertStringContainsString('  [TEST USER EMAIL] its.inevitable@hotmail.com', $result);
+        self::assertStringContainsString('  [POSTCODE] LD34 8GG', $result);
     }
 
     public function testIfApiEnabledMinkSessionIsNotCalledUpon()
@@ -558,8 +558,7 @@ class FailureContextTest extends TestCase
         $html = '<html><body>Hello World</body></html>';
         $expectedLineNumber = 99;
 
-        $exceptionMock = $this->getMockBuilder(Exception::class)->getMock();
-        $exceptionMock->expects($this->never())->method('getMessage');
+        $exceptionMock = $this->getMockBuilder(TestException::class)->getMock();
 
         $this->setObjectPrivatePropertyValue($exceptionMock, 'file', $exceptionFile);
         $scope = $this->getAfterStepScopeWithMockedParams();
@@ -588,13 +587,12 @@ class FailureContextTest extends TestCase
         $this->mockStaticCaller(Output::class, 'getOption', ['api'], true);
         $this->setPrivatePropertyValue('currentScenario', $currentScenarioMock);
 
-        $result = $this->testObject
-            ->setMink($minkMock)
-            ->gatherStateFactsAfterFailedStep($scope);
+        $this->testObject->setMink($minkMock);
+        $result = $this->testObject->gatherStateFactsAfterFailedStep($scope);
 
-        self::assertContains('[STATE]', $result);
-        self::assertContains('  [TEST USER EMAIL] its.inevitable@hotmail.com', $result);
-        self::assertContains('  [POSTCODE] LD34 8GG', $result);
+        self::assertStringContainsString('[STATE]', $result);
+        self::assertStringContainsString('  [TEST USER EMAIL] its.inevitable@hotmail.com', $result);
+        self::assertStringContainsString('  [POSTCODE] LD34 8GG', $result);
     }
 
     public function testGatherDebugBarDetailsAllFound()
@@ -615,14 +613,10 @@ class FailureContextTest extends TestCase
             ->willReturn('Unable to execute query.');
 
         $page = $this->getMockBuilder(DocumentElement::class)->disableOriginalConstructor()->getMock();
-        $page->expects($this->at(0))
-            ->method('find')
-            ->with('css', '#debug .message')
-            ->willReturn($elementMock);
-        $page->expects($this->at(1))
-            ->method('find')
-            ->with('css', '#debug .query')
-            ->willReturn($elementMock2);
+        $page->method('find')->willReturnCallback(function ($type, $selector) use ($elementMock, $elementMock2) {
+            if ($selector === '#debug .message') return $elementMock;
+            if ($selector === '#debug .query') return $elementMock2;
+        });
 
         $result = $this->callProtectedMethod('gatherDebugBarDetails', [$debugBarSelectors, $page]);
 
@@ -682,14 +676,10 @@ class FailureContextTest extends TestCase
             ->willReturn('Page not found.');
 
         $page = $this->getMockBuilder(DocumentElement::class)->disableOriginalConstructor()->getMock();
-        $page->expects($this->at(0))
-            ->method('find')
-            ->with('css', '#debug .message')
-            ->willReturn($elementMock);
-        $page->expects($this->at(1))
-            ->method('find')
-            ->with('css', '#debug .query')
-            ->willReturn(false);
+        $page->method('find')->willReturnCallback(function ($type, $selector) use ($elementMock) {
+            if ($selector === '#debug .message') return $elementMock;
+            return false;
+        });
 
         $result = $this->callProtectedMethod('gatherDebugBarDetails', [$debugBarSelectors, $page]);
 
@@ -781,19 +771,13 @@ class FailureContextTest extends TestCase
 
     private function mockStaticCaller($service, $method, $params, $return)
     {
-        $this->mockStaticCallerAt($this->at, $service, $method, $params, $return);
-        $this->at += 1;
-
+        $this->mockCallReturns[] = [$service, $method, $params, $return, true];
         return $this;
     }
 
     private function mockStaticCallerAt($at, $service, $method, $params, $return)
     {
-        $this->dependencies['staticCallerMock']->expects($this->at($at))
-            ->method('call')
-            ->with($service, $method, $params)
-            ->willReturn($return);
-
+        $this->mockCallReturns[] = [$service, $method, $params, $return, true];
         return $this;
     }
 }

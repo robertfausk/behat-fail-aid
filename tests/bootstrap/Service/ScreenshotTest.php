@@ -14,11 +14,10 @@ use Behat\Mink\Element\Element;
 use Behat\Mink\Exception\DriverException;
 use Exception;
 use FailAid\Service\Screenshot;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group screenshotTests
- */
+#[Group('screenshotTests')]
 class ScreenshotTest extends TestCase
 {
     public function setUp(): void
@@ -57,11 +56,9 @@ class ScreenshotTest extends TestCase
         self::assertEquals($expectedHostDirectory, Screenshot::$screenshotHostDirectory);
     }
 
-    /**
-     * @expectedException Exception
-     */
     public function testTakeScreenshotNoHtml()
     {
+        $this->expectException(Exception::class);
         $filename = '/file/name.png';
         $page = $this->getMockBuilder(Element::class)->disableOriginalConstructor()->getMock();
         $page->expects($this->once())
@@ -160,7 +157,7 @@ class ScreenshotTest extends TestCase
         Screenshot::setOptions($options, $siteFilters);
         $result = Screenshot::takeScreenshot($page, $driver);
 
-        self::assertRegExp('#http://ci/failures/99238843/.+\.html#', $result);
+        self::assertMatchesRegularExpression('#http://ci/failures/99238843/.+\.html#', $result);
     }
 
     public function testApplySiteSpecificFilters()

@@ -15,19 +15,15 @@ class JSDebugTest extends TestCase
         $expectedResult = ['A console log output goes longer than twenty characters', 'another console log output'];
 
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
-        $session->expects($this->at(0))
-            ->method('evaluateScript')
-            ->with('typeof window.jsLogs')
-            ->willReturn('array');
-        $session->expects($this->at(1))
-            ->method('evaluateScript')
-            ->with('return window.jsLogs')
-            ->willReturn($expectedResult);
+        $session->method('evaluateScript')->willReturnMap([
+            ['typeof window.jsLogs', 'array'],
+            ['return window.jsLogs', $expectedResult],
+        ]);
 
         JSDebug::setOptions(['trim' => 20, 'logs' => true]);
         $result = JSDebug::getJsLogs($session);
 
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertEquals('A console log output', $result[0]);
         self::assertEquals('another console log ', $result[1]);
     }
@@ -35,7 +31,7 @@ class JSDebugTest extends TestCase
     public function testGetJsLogsImplementationError()
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
-        $session->expects($this->at(0))
+        $session->expects($this->once())
             ->method('evaluateScript')
             ->with('typeof window.jsLogs')
             ->willReturn('undefined');
@@ -43,7 +39,7 @@ class JSDebugTest extends TestCase
         JSDebug::setOptions(['trim' => 20, 'logs' => true]);
         $result = JSDebug::getJsLogs($session);
 
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertEquals(['Unable to fetch js logs: JS logs enabled but window.jsLogs is undefined, please check implementation and on page load js errors.'], $result);
     }
 
@@ -59,7 +55,7 @@ class JSDebugTest extends TestCase
         JSDebug::setOptions(['trim' => 20, 'logs' => true]);
         $result = JSDebug::getJsLogs($session);
 
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertEquals([], $result);
     }
 
@@ -76,7 +72,7 @@ class JSDebugTest extends TestCase
         JSDebug::setOptions(['trim' => 20, 'logs' => true]);
         $result = JSDebug::getJsLogs($session);
 
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertEquals(['Unable to fetch js logs: ' . $message], $result);
     }
 
@@ -85,19 +81,15 @@ class JSDebugTest extends TestCase
         $expectedResult = ['A console log output goes longer than twenty characters', 'another console log output'];
 
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
-        $session->expects($this->at(0))
-            ->method('evaluateScript')
-            ->with('typeof window.jsWarns')
-            ->willReturn('array');
-        $session->expects($this->at(1))
-            ->method('evaluateScript')
-            ->with('return window.jsWarns')
-            ->willReturn($expectedResult);
+        $session->method('evaluateScript')->willReturnMap([
+            ['typeof window.jsWarns', 'array'],
+            ['return window.jsWarns', $expectedResult],
+        ]);
 
         JSDebug::setOptions(['trim' => 20, 'warns' => true]);
         $result = JSDebug::getJsWarns($session);
 
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertEquals('A console log output', $result[0]);
         self::assertEquals('another console log ', $result[1]);
     }
@@ -105,7 +97,7 @@ class JSDebugTest extends TestCase
     public function testGetJsWarnsImplementationError()
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
-        $session->expects($this->at(0))
+        $session->expects($this->once())
             ->method('evaluateScript')
             ->with('typeof window.jsWarns')
             ->willReturn('undefined');
@@ -113,7 +105,7 @@ class JSDebugTest extends TestCase
         JSDebug::setOptions(['trim' => 20, 'warns' => true]);
         $result = JSDebug::getJsWarns($session);
 
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertEquals(['Unable to fetch js warns: JS warns enabled but window.jsWarns is undefined, please check implementation and on page load js errors.'], $result);
     }
 
@@ -129,7 +121,7 @@ class JSDebugTest extends TestCase
         JSDebug::setOptions(['trim' => 20, 'warns' => true]);
         $result = JSDebug::getJsWarns($session);
 
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertEquals([], $result);
     }
 
@@ -146,7 +138,7 @@ class JSDebugTest extends TestCase
         JSDebug::setOptions(['trim' => 20, 'warns' => true]);
         $result = JSDebug::getJsWarns($session);
 
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertEquals(['Unable to fetch js warns: ' . $message], $result);
     }
 
@@ -155,19 +147,15 @@ class JSDebugTest extends TestCase
         $expectedResult = ['A console log output goes longer than twenty characters', 'another console log output'];
 
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
-        $session->expects($this->at(0))
-            ->method('evaluateScript')
-            ->with('typeof window.jsErrors')
-            ->willReturn('array');
-        $session->expects($this->at(1))
-            ->method('evaluateScript')
-            ->with('return window.jsErrors')
-            ->willReturn($expectedResult);
+        $session->method('evaluateScript')->willReturnMap([
+            ['typeof window.jsErrors', 'array'],
+            ['return window.jsErrors', $expectedResult],
+        ]);
 
         JSDebug::setOptions(['trim' => 20, 'errors' => true]);
         $result = JSDebug::getJsErrors($session);
 
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertEquals('A console log output', $result[0]);
         self::assertEquals('another console log ', $result[1]);
     }
@@ -175,7 +163,7 @@ class JSDebugTest extends TestCase
     public function testGetJsErrorsImplementationError()
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
-        $session->expects($this->at(0))
+        $session->expects($this->once())
             ->method('evaluateScript')
             ->with('typeof window.jsErrors')
             ->willReturn('undefined');
@@ -183,7 +171,7 @@ class JSDebugTest extends TestCase
         JSDebug::setOptions(['trim' => 20, 'errors' => true]);
         $result = JSDebug::getJsErrors($session);
 
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertEquals(['Unable to fetch js errors: JS errors enabled but window.jsErrors is undefined, please check implementation and on page load js errors.'], $result);
     }
 
@@ -199,7 +187,7 @@ class JSDebugTest extends TestCase
         JSDebug::setOptions(['trim' => 20, 'errors' => true]);
         $result = JSDebug::getJsErrors($session);
 
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertEquals([], $result);
     }
 
@@ -216,7 +204,7 @@ class JSDebugTest extends TestCase
         JSDebug::setOptions(['trim' => 20, 'errors' => true]);
         $result = JSDebug::getJsErrors($session);
 
-        self::assertInternalType('array', $result);
+        self::assertIsArray($result);
         self::assertEquals(['Unable to fetch js errors: ' . $message], $result);
     }
 }
