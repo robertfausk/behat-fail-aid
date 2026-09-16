@@ -233,7 +233,7 @@ class ExtensionTest extends TestCase
     {
         $container = $this->loadExtension();
 
-        $output = $container->getParameter('genesis.failaid.config.output');
+        $output = $container->getParameter('failaid.config.output');
         $this->assertFalse($output['api']);
         $this->assertTrue($output['url']);
         $this->assertTrue($output['status']);
@@ -247,7 +247,7 @@ class ExtensionTest extends TestCase
             'screenshot' => ['directory' => '/tmp/shots', 'mode' => 'png'],
         ]);
 
-        $screenshot = $container->getParameter('genesis.failaid.config.screenshot');
+        $screenshot = $container->getParameter('failaid.config.screenshot');
         $this->assertSame('/tmp/shots', $screenshot['directory']);
         $this->assertSame('png', $screenshot['mode']);
     }
@@ -256,7 +256,7 @@ class ExtensionTest extends TestCase
     {
         $container = $this->loadExtension();
 
-        $this->assertSame([], $container->getParameter('genesis.failaid.config.debugBarSelectors'));
+        $this->assertSame([], $container->getParameter('failaid.config.debugBarSelectors'));
     }
 
     public function testLoadSetsDebugBarSelectorsParameter(): void
@@ -265,7 +265,7 @@ class ExtensionTest extends TestCase
             'debugBarSelectors' => ['msg' => '.bar .msg', 'queries' => '.bar .queries'],
         ]);
 
-        $selectors = $container->getParameter('genesis.failaid.config.debugBarSelectors');
+        $selectors = $container->getParameter('failaid.config.debugBarSelectors');
         $this->assertSame('.bar .msg', $selectors['msg']);
         $this->assertSame('.bar .queries', $selectors['queries']);
     }
@@ -276,7 +276,7 @@ class ExtensionTest extends TestCase
             'siteFilters' => ['/js/' => 'http://cdn.example.com/js/'],
         ]);
 
-        $filters = $container->getParameter('genesis.failaid.config.siteFilters');
+        $filters = $container->getParameter('failaid.config.siteFilters');
         $this->assertSame('http://cdn.example.com/js/', $filters['/js/']);
     }
 
@@ -286,7 +286,7 @@ class ExtensionTest extends TestCase
             'trackJs' => ['errors' => true, 'trim' => 50],
         ]);
 
-        $trackJs = $container->getParameter('genesis.failaid.config.trackJs');
+        $trackJs = $container->getParameter('failaid.config.trackJs');
         $this->assertTrue($trackJs['errors']);
         $this->assertSame(50, $trackJs['trim']);
     }
@@ -297,7 +297,7 @@ class ExtensionTest extends TestCase
 
         $this->assertSame(
             'javascript',
-            $container->getParameter('genesis.failaid.config.defaultSession')
+            $container->getParameter('failaid.config.defaultSession')
         );
     }
 

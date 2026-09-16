@@ -129,28 +129,28 @@ class Extension implements ExtensionInterface
      */
     public function load(ContainerBuilder $container, array $config): void
     {
-        $container->setParameter('genesis.failaid.config.screenshot', $this->getScreenshotOptions($config));
+        $container->setParameter('failaid.config.screenshot', $this->getScreenshotOptions($config));
 
         if (! isset($config['debugBarSelectors'])) {
             $config['debugBarSelectors'] = [];
         }
-        $container->setParameter('genesis.failaid.config.debugBarSelectors', $config['debugBarSelectors']);
+        $container->setParameter('failaid.config.debugBarSelectors', $config['debugBarSelectors']);
 
         if (! isset($config['siteFilters'])) {
             $config['siteFilters'] = [];
         }
-        $container->setParameter('genesis.failaid.config.siteFilters', $config['siteFilters']);
-        $container->setParameter('genesis.failaid.config.defaultSession', $config['defaultSession']);
-        $container->setParameter('genesis.failaid.config.trackJs', $config['trackJs']);
-        $container->setParameter('genesis.failaid.config.output', $config['output']);
+        $container->setParameter('failaid.config.siteFilters', $config['siteFilters']);
+        $container->setParameter('failaid.config.defaultSession', $config['defaultSession']);
+        $container->setParameter('failaid.config.trackJs', $config['trackJs']);
+        $container->setParameter('failaid.config.output', $config['output']);
 
         $definition = new Definition(Initializer::class, [
-            '%genesis.failaid.config.screenshot%',
-            '%genesis.failaid.config.siteFilters%',
-            '%genesis.failaid.config.debugBarSelectors%',
-            '%genesis.failaid.config.trackJs%',
-            '%genesis.failaid.config.defaultSession%',
-            '%genesis.failaid.config.output%',
+            '%failaid.config.screenshot%',
+            '%failaid.config.siteFilters%',
+            '%failaid.config.debugBarSelectors%',
+            '%failaid.config.trackJs%',
+            '%failaid.config.defaultSession%',
+            '%failaid.config.output%',
         ]);
         $definition->addTag(ContextExtension::INITIALIZER_TAG);
         $container->setDefinition(self::CONTEXT_INITIALISER, $definition);

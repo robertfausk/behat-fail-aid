@@ -1,6 +1,11 @@
 Behat Fail Aid ![Master branch](https://github.com/robertfausk/behat-fail-aid/actions/workflows/ci-tests.yaml/badge.svg?branch=master) [![Latest Stable Version](https://poser.pugx.org/robertfausk/behat-fail-aid/v/stable)](https://packagist.org/packages/robertfausk/behat-fail-aid) [![Total Downloads](https://poser.pugx.org/robertfausk/behat-fail-aid/downloads)](https://packagist.org/packages/robertfausk/behat-fail-aid) [![License](https://poser.pugx.org/robertfausk/behat-fail-aid/license)](https://packagist.org/packages/robertfausk/behat-fail-aid) [![Monthly Downloads](https://poser.pugx.org/robertfausk/behat-fail-aid/d/monthly)](https://packagist.org/packages/robertfausk/behat-fail-aid) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=robertfausk_behat-fail-aid&metric=alert_status)](https://sonarcloud.io/dashboard?id=robertfausk_behat-fail-aid) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=robertfausk_behat-fail-aid&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=robertfausk_behat-fail-aid) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=robertfausk_behat-fail-aid&metric=security_rating)](https://sonarcloud.io/dashboard?id=robertfausk_behat-fail-aid)
 =======
 
+Upgrading?
+----------
+
+See [UPGRADE.md](UPGRADE.md) for breaking changes and migration instructions.
+
 Introduction
 -------------
 
