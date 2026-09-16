@@ -17,8 +17,7 @@
   },
   "require-dev": {
     "phpunit/phpunit": "^11.0",
-    "behat/mink-goutte-driver": "^1.2",
-    "ciaranmcnulty/behat-localwebserverextension": "^1.1"
+    "behat/mink-goutte-driver": "^2.0"
   },
   "autoload": {
     "psr-4": {
@@ -31,6 +30,8 @@
     "genesis/db-backup-restore": "Quickly backup and restore your database."
   },
   "scripts": {
-    "tests": "./vendor/bin/phpunit -c tests"
+    "tests": "./bin/run-tests.sh",
+    "tests:unit": "./vendor/bin/phpunit -c tests",
+    "tests:behat": "./vendor/bin/behat"
   }
 }
