@@ -1,5 +1,6 @@
 {
-    "name": "genesis/behat-fail-aid",
+    "name": "robertfausk/behat-fail-aid",
+    "type": "behat-extension",
     "description": "Get more out of your test suite by getting it to work with you when tests fail. Screenshots and more. Works with Goutte and MinkExtension.",
     "keywords": [
         "behat",
@@ -14,7 +15,8 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Robert Freigang"
+            "name": "Robert Freigang",
+            "email": "robertfreigang@gmx.de"
         }
     ],
     "require": {
@@ -36,11 +38,6 @@
         "psr-4": {
             "FailAid\\": "../../src/"
         }
-    },
-    "suggest": {
-        "genesis/sql-data-mods": "Extends behat-sql-extension to provide a powerful and simple framework to manage your data modules.",
-        "genesis/test-routing": "Simplistic routing that can extend main app routing for testing purposes.",
-        "genesis/db-backup-restore": "Quickly backup and restore your database."
     },
     "scripts": {
         "tests": "./bin/run-tests.sh",
