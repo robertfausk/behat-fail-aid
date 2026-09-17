@@ -53,8 +53,7 @@ jobs:
       - name: Install dependencies
         run: |
           composer install --no-interaction --prefer-dist
-          cp ".scenarios.lock/${{ matrix.scenario }}/composer.lock" composer.lock
-          composer install --no-interaction --prefer-dist
+          composer scenario ${{ matrix.scenario }}
 
       - name: Run PHPUnit
         run: composer tests:unit
