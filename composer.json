@@ -19,7 +19,9 @@
   },
   "require-dev": {
     "phpunit/phpunit": "^11.0",
-    "behat/mink-goutte-driver": "^2.0",
+    "behat/mink-browserkit-driver": "^2.0",
+    "symfony/browser-kit": "^7.0",
+    "symfony/http-client": "^7.0",
     "g1a/composer-test-scenarios": "^3",
     "matthiasnoback/symfony-config-test": "^5",
     "phpstan/phpstan": "^2.0",
