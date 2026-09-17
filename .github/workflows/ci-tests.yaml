@@ -63,4 +63,9 @@ jobs:
         run: php -S localhost:8531 -t app &
 
       - name: Run Behat
-        run: composer tests:behat
+        run: |
+          OUTPUT=$(./vendor/bin/behat 2>&1)
+          echo "$OUTPUT"
+          # fail.feature contains 1 intentionally failing scenario run across 3 suites = 3 expected failures
+          echo "$OUTPUT" | grep -q "9 scenarios (6 passed, 3 failed)" \
+            || { echo "Unexpected behat scenario result!"; exit 1; }
