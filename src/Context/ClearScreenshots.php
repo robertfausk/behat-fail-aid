@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FailAid\Context;
 
 use Behat\Testwork\Cli\Controller;
@@ -15,26 +17,21 @@ class ClearScreenshots implements Controller
 {
     /**
      * Configures command to be executable by the controller.
-     *
-     * @param SymfonyCommand $command
      */
-    public function configure(SymfonyCommand $command)
+    public function configure(SymfonyCommand $command): void
     {
         $command->addOption('--clear-screenshots', null, InputOption::VALUE_NONE, 'Remove all screenshots before suite.');
     }
 
     /**
      * Executes controller.
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return null|integer
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): ?int
     {
         if ($input->getOption('clear-screenshots')) {
             FailureContext::setAutoClean(true);
         }
+
+        return null;
     }
 }

@@ -16,7 +16,7 @@ default:
         - FailAid\Context\FailureContext:
           - output:
             api: true
-    generic-php55:
+    generic:
       contexts:
         - FeatureContext
         - Behat\MinkExtension\Context\MinkContext
@@ -31,7 +31,6 @@ default:
         mode: default
         autoClean: false
         size: 1444x1280
-        # hostDirectory: /home/abdul/Projects/personal/behat-fail-aid/features/failures
         hostUrl: http://ci/failures/$USER/
       debugBarSelectors:
         message: '#debugBar .message'
@@ -44,12 +43,9 @@ default:
         warns: true
         logs: true
         trim: 1000
-    Cjm\Behat\LocalWebserverExtension:
-      docroot: '%paths.base%/app'
-      port: 8531
     Behat\MinkExtension:
-      default_session: goutte
-      base_url:  'http://localhost:8531/'
+      default_session: browserkit_http
+      base_url: 'http://localhost:8531/'
       sessions:
-        goutte:
-          goutte: ~
+        browserkit_http:
+          browserkit_http: ~

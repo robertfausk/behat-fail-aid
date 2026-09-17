@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FailAid\Service;
 
-function date() {
+function date()
+{
     return '123';
 }
 
@@ -14,14 +17,13 @@ use Behat\Mink\Element\Element;
 use Behat\Mink\Exception\DriverException;
 use Exception;
 use FailAid\Service\Screenshot;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @group screenshotTests
- */
-class ScreenshotTest extends PHPUnit_Framework_TestCase
+#[Group('screenshotTests')]
+class ScreenshotTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         Screenshot::setOptions([
             'hostDirectory' => null,
@@ -29,18 +31,18 @@ class ScreenshotTest extends PHPUnit_Framework_TestCase
         ], []);
     }
 
-    public function testSetOptions()
+    public function test_set_options(): void
     {
         $options = [
             'directory' => __DIR__,
             'mode' => 'html',
             'autoClean' => true,
             'size' => '1024x2000',
-            'hostDirectory' => '/abc/123/$BRANCH_NAME/$USER/'
+            'hostDirectory' => '/abc/123/$BRANCH_NAME/$USER/',
         ];
         $siteFilters = [
             'abc' => '123',
-            'xyz' => '789'
+            'xyz' => '789',
         ];
 
         $expectedHostDirectory = '/abc/123/master/abdul/123';
@@ -50,49 +52,47 @@ class ScreenshotTest extends PHPUnit_Framework_TestCase
         Screenshot::setOptions($options, $siteFilters);
 
         self::assertEquals($siteFilters, Screenshot::$siteFilters);
-        self::assertEquals($options['directory'] . '/123', Screenshot::$screenshotDir);
+        self::assertEquals($options['directory'].'/123', Screenshot::$screenshotDir);
         self::assertEquals($options['mode'], Screenshot::$screenshotMode);
         self::assertEquals($options['autoClean'], Screenshot::$screenshotAutoClean);
         self::assertEquals(['1024', '2000'], Screenshot::$screenshotSize);
         self::assertEquals($expectedHostDirectory, Screenshot::$screenshotHostDirectory);
     }
 
-    /**
-     * @expectedException Exception
-     */
-    public function testTakeScreenshotNoHtml()
+    public function test_take_screenshot_no_html(): void
     {
+        $this->expectException(Exception::class);
         $filename = '/file/name.png';
         $page = $this->getMockBuilder(Element::class)->disableOriginalConstructor()->getMock();
         $page->expects($this->once())
-            ->method('getOuterHtml')
+            ->method('getHtml')
             ->will($this->throwException(new Exception()));
         $driver = $this->getMockBuilder(DriverInterface::class)->getMock();
 
         Screenshot::takeScreenshot($page, $driver);
     }
 
-    public function testTakeScreenshotWithHtmlAndDefaultScreenshotModeWithSeleniumDriver()
+    public function test_take_screenshot_with_html_and_default_screenshot_mode_with_selenium_driver(): void
     {
         $filename = '/file/name-';
         $page = $this->getMockBuilder(Element::class)->disableOriginalConstructor()->getMock();
         $page->expects($this->any())
-            ->method('getOuterHtml')
+            ->method('getHtml')
             ->willReturn('<html></html>');
         $driver = $this->getMockBuilder(Selenium2Driver::class)->getMock();
 
         Screenshot::$screenshotMode = 'default';
         $result = Screenshot::takeScreenshot($page, $driver);
 
-        self::assertEquals('png', pathinfo($result, PATHINFO_EXTENSION));
+        self::assertEquals('png', pathinfo($result, \PATHINFO_EXTENSION));
     }
 
-    public function testTakeScreenshotWithHtmlAndDefaultScreenshotModeWithNonSeleniumDriver()
+    public function test_take_screenshot_with_html_and_default_screenshot_mode_with_non_selenium_driver(): void
     {
         $filename = '/file/name-';
         $page = $this->getMockBuilder(Element::class)->disableOriginalConstructor()->getMock();
         $page->expects($this->any())
-            ->method('getOuterHtml')
+            ->method('getHtml')
             ->willReturn('<html></html>');
         $driver = $this->getMockBuilder(DriverInterface::class)->getMock();
         $driver
@@ -103,67 +103,67 @@ class ScreenshotTest extends PHPUnit_Framework_TestCase
         Screenshot::$screenshotMode = 'default';
         $result = Screenshot::takeScreenshot($page, $driver);
 
-        self::assertEquals('html', pathinfo($result, PATHINFO_EXTENSION));
+        self::assertEquals('html', pathinfo($result, \PATHINFO_EXTENSION));
     }
 
-    public function testTakeScreenshotWithHtmlAndHtmlScreenshotMode()
+    public function test_take_screenshot_with_html_and_html_screenshot_mode(): void
     {
         $filename = '/file/name-';
         $page = $this->getMockBuilder(Element::class)->disableOriginalConstructor()->getMock();
         $page->expects($this->any())
-            ->method('getOuterHtml')
+            ->method('getHtml')
             ->willReturn('<html></html>');
         $driver = $this->getMockBuilder(DriverInterface::class)->getMock();
 
         Screenshot::$screenshotMode = 'html';
         $result = Screenshot::takeScreenshot($page, $driver);
 
-        self::assertEquals('html', pathinfo($result, PATHINFO_EXTENSION));
+        self::assertEquals('html', pathinfo($result, \PATHINFO_EXTENSION));
     }
 
-    public function testTakeScreenshotWithHtmlAndPNGScreenshotMode()
+    public function test_take_screenshot_with_html_and_png_screenshot_mode(): void
     {
         $filename = '/file/name-';
         $page = $this->getMockBuilder(Element::class)->disableOriginalConstructor()->getMock();
         $page->expects($this->any())
-            ->method('getOuterHtml')
+            ->method('getHtml')
             ->willReturn('<html></html>');
         $driver = $this->getMockBuilder(Selenium2Driver::class)->getMock();
 
         Screenshot::$screenshotMode = 'png';
         $result = Screenshot::takeScreenshot($page, $driver);
 
-        self::assertEquals('png', pathinfo($result, PATHINFO_EXTENSION));
+        self::assertEquals('png', pathinfo($result, \PATHINFO_EXTENSION));
     }
 
-    public function testTakeScreenshotWithHostUrl()
+    public function test_take_screenshot_with_host_url(): void
     {
         $options = [
             'directory' => null,
             'mode' => 'html',
             'autoClean' => true,
             'size' => '1024x2000',
-            'hostUrl' => 'http://ci/failures/$JOB_NUMBER/'
+            'hostUrl' => 'http://ci/failures/$JOB_NUMBER/',
         ];
         $siteFilters = [];
 
         $filename = '/file/name-';
         $page = $this->getMockBuilder(Element::class)->disableOriginalConstructor()->getMock();
         $page->expects($this->any())
-            ->method('getOuterHtml')
+            ->method('getHtml')
             ->willReturn('<html></html>');
         $driver = $this->getMockBuilder(Selenium2Driver::class)->getMock();
 
         $jobNumber = 99238843;
-        putenv('JOB_NUMBER=' . $jobNumber);
+        putenv('JOB_NUMBER='.$jobNumber);
 
         Screenshot::setOptions($options, $siteFilters);
         $result = Screenshot::takeScreenshot($page, $driver);
 
-        self::assertRegExp('#http://ci/failures/99238843/.+\.html#', $result);
+        self::assertMatchesRegularExpression('#http://ci/failures/99238843/.+\.html#', $result);
     }
 
-    public function testApplySiteSpecificFilters()
+    public function test_apply_site_specific_filters(): void
     {
         $content = '<html>
         <body>
@@ -184,7 +184,7 @@ class ScreenshotTest extends PHPUnit_Framework_TestCase
         Screenshot::$siteFilters = [
             '/assets/images/' => 'http://site.dev/assets/images/',
             '/assets/css/' => 'http://site.dev/assets/css/',
-            '/assets/script/' => 'http://site.dev/assets/javascripts/'
+            '/assets/script/' => 'http://site.dev/assets/javascripts/',
         ];
 
         $result = Screenshot::applySiteSpecificFilters($content);

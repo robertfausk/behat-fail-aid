@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FailAid\Tests\Context;
 
 use Behat\Behat\Hook\Scope\ScenarioScope;
 use Behat\Gherkin\Node\ScenarioInterface;
 use Behat\Mink\Driver\DriverInterface;
 use FailAid\Service\Output;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class OutputTest extends PHPUnit_Framework_TestCase
+class OutputTest extends TestCase
 {
-    public function testProvideDiff()
+    public function test_provide_diff(): void
     {
         $expected = 'abc';
         $actual = 'xyz';
@@ -28,7 +30,7 @@ Info: clearly not equal.';
         self::assertEquals($expectedOutput, $result);
     }
 
-    public function testGetExceptionDetails()
+    public function test_get_exception_details(): void
     {
         $currentUrl = 'http://site.dev/';
         $statusCode = '500';
@@ -43,13 +45,13 @@ Info: clearly not equal.';
 
         $jsErrors = [
             '[Console error]: Undefined var "abc"',
-            '[Console error]: Undefined var "xyz"'
+            '[Console error]: Undefined var "xyz"',
         ];
         $jsWarns = [
             '[Console warn]: Could not load data in.',
         ];
         $jsLogs = [
-            '[Console log]: OOps left debug in.'
+            '[Console log]: OOps left debug in.',
         ];
 
         $scenarioMock = $this->getMockBuilder(ScenarioInterface::class)->getMock();
@@ -108,7 +110,7 @@ Info: clearly not equal.';
 ', $result);
     }
 
-    public function testGetExceptionDetailsTurnOptionsOff()
+    public function test_get_exception_details_turn_options_off(): void
     {
         $currentUrl = 'http://site.dev/';
         $statusCode = '500';
@@ -123,13 +125,13 @@ Info: clearly not equal.';
 
         $jsErrors = [
             '[Console error]: Undefined var "abc"',
-            '[Console error]: Undefined var "xyz"'
+            '[Console error]: Undefined var "xyz"',
         ];
         $jsWarns = [
             '[Console warn]: Could not load data in.',
         ];
         $jsLogs = [
-            '[Console log]: OOps left debug in.'
+            '[Console log]: OOps left debug in.',
         ];
 
         $scenarioMock = $this->getMockBuilder(ScenarioInterface::class)->getMock();

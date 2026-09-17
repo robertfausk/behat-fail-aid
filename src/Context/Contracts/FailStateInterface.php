@@ -1,29 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FailAid\Context\Contracts;
 
-use Behat\Mink\Element\DocumentElement;
-
-/**
- * FailStateInterface interface.
- */
 interface FailStateInterface
 {
     /**
      * @BeforeScenario
      */
-    public function refreshStates();
+    public function refreshStates(): void;
 
     /**
-     * @param string $name
      * @param string|int $value
      */
-    public static function addState($name, $value);
+    public static function addState(string $name, $value): void;
 
     /**
-     * @param array $state
-     *
-     * @return string
+     * @param array<string, mixed> $states
      */
-    public function getStateDetails(array $states);
+    public function getStateDetails(array $states): string;
 }

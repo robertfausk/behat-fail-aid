@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FailAid\Extension\ServiceContainer;
 
 use Behat\Behat\Context\ServiceContainer\ContextExtension;
@@ -21,24 +23,21 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class Extension implements ExtensionInterface
 {
-    const CONTEXT_INITIALISER = 'failaid.context_initialiser';
+    public const CONTEXT_INITIALISER = 'failaid.context_initialiser';
 
     /**
      * You can modify the container here before it is dumped to PHP code.
      *
      * Create definition object to handle in the context?
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        return;
     }
 
     /**
      * Returns the extension config key.
-     *
-     * @return string
      */
-    public function getConfigKey()
+    public function getConfigKey(): string
     {
         return 'FailAidExtension';
     }
@@ -50,18 +49,15 @@ class Extension implements ExtensionInterface
      * before any extension `configure()` method is called. This allows extensions
      * to hook into the configuration of other extensions providing such an
      * extension point.
-     *
      */
-    public function initialize(ExtensionManager $extensionManager)
+    public function initialize(ExtensionManager $extensionManager): void
     {
-        return;
     }
 
     /**
      * Setups configuration for the extension.
-     *
      */
-    public function configure(ArrayNodeDefinition $builder)
+    public function configure(ArrayNodeDefinition $builder): void
     {
         $builder
             ->children()
@@ -101,13 +97,13 @@ class Extension implements ExtensionInterface
                     ->end()
                 ->end()
                 ->scalarNode('defaultSession')->defaultValue(null)->end()
-                /**
+                /*
                  * DEPRECATED in favour of screenshot option, to be removed in next major version bump.
                  */
                 ->scalarNode('screenshotDirectory')
                     ->defaultNull()
                 ->end()
-                /**
+                /*
                  * DEPRECATED in favour of screenshot option, to be removed in next major version bump.
                  */
                 ->scalarNode('screenshotMode')
@@ -125,32 +121,31 @@ class Extension implements ExtensionInterface
 
     /**
      * Loads extension services into temporary container.
-     *
      */
-    public function load(ContainerBuilder $container, array $config)
+    public function load(ContainerBuilder $container, array $config): void
     {
-        $container->setParameter('genesis.failaid.config.screenshot', $this->getScreenshotOptions($config));
+        $container->setParameter('failaid.config.screenshot', $this->getScreenshotOptions($config));
 
-        if (! isset($config['debugBarSelectors'])) {
+        if (!isset($config['debugBarSelectors'])) {
             $config['debugBarSelectors'] = [];
         }
-        $container->setParameter('genesis.failaid.config.debugBarSelectors', $config['debugBarSelectors']);
+        $container->setParameter('failaid.config.debugBarSelectors', $config['debugBarSelectors']);
 
-        if (! isset($config['siteFilters'])) {
+        if (!isset($config['siteFilters'])) {
             $config['siteFilters'] = [];
         }
-        $container->setParameter('genesis.failaid.config.siteFilters', $config['siteFilters']);
-        $container->setParameter('genesis.failaid.config.defaultSession', $config['defaultSession']);
-        $container->setParameter('genesis.failaid.config.trackJs', $config['trackJs']);
-        $container->setParameter('genesis.failaid.config.output', $config['output']);
+        $container->setParameter('failaid.config.siteFilters', $config['siteFilters']);
+        $container->setParameter('failaid.config.defaultSession', $config['defaultSession']);
+        $container->setParameter('failaid.config.trackJs', $config['trackJs']);
+        $container->setParameter('failaid.config.output', $config['output']);
 
         $definition = new Definition(Initializer::class, [
-            '%genesis.failaid.config.screenshot%',
-            '%genesis.failaid.config.siteFilters%',
-            '%genesis.failaid.config.debugBarSelectors%',
-            '%genesis.failaid.config.trackJs%',
-            '%genesis.failaid.config.defaultSession%',
-            '%genesis.failaid.config.output%',
+            '%failaid.config.screenshot%',
+            '%failaid.config.siteFilters%',
+            '%failaid.config.debugBarSelectors%',
+            '%failaid.config.trackJs%',
+            '%failaid.config.defaultSession%',
+            '%failaid.config.output%',
         ]);
         $definition->addTag(ContextExtension::INITIALIZER_TAG);
         $container->setDefinition(self::CONTEXT_INITIALISER, $definition);
@@ -160,49 +155,48 @@ class Extension implements ExtensionInterface
         $this->addFeedbackOnFailureCommand($container);
     }
 
-    private function addScenarioDebugCommand($container)
+    private function addScenarioDebugCommand($container): void
     {
         $definition = new Definition(
             ScenarioDebugCli::class,
-            array(new Reference(self::CONTEXT_INITIALISER))
+            [new Reference(self::CONTEXT_INITIALISER)]
         );
-        $definition->addTag(CliExtension::CONTROLLER_TAG, array('priority' => 1));
-        $container->setDefinition(CliExtension::CONTROLLER_TAG . '.failaid.scenariodebug', $definition);
+        $definition->addTag(CliExtension::CONTROLLER_TAG, ['priority' => 1]);
+        $container->setDefinition(CliExtension::CONTROLLER_TAG.'.failaid.scenariodebug', $definition);
     }
 
-    private function addAutoCleanCommand($container)
+    private function addAutoCleanCommand($container): void
     {
         $definition = new Definition(
             ClearScreenshots::class,
-            array(new Reference(self::CONTEXT_INITIALISER))
+            [new Reference(self::CONTEXT_INITIALISER)]
         );
-        $definition->addTag(CliExtension::CONTROLLER_TAG, array('priority' => 1));
-        $container->setDefinition(CliExtension::CONTROLLER_TAG . '.failaid.clearScreenshots', $definition);
+        $definition->addTag(CliExtension::CONTROLLER_TAG, ['priority' => 1]);
+        $container->setDefinition(CliExtension::CONTROLLER_TAG.'.failaid.clearScreenshots', $definition);
     }
 
-    private function addWaitOnFailureCommand($container)
+    private function addWaitOnFailureCommand($container): void
     {
         $definition = new Definition(
             WaitOnFailure::class,
-            array(new Reference(self::CONTEXT_INITIALISER))
+            [new Reference(self::CONTEXT_INITIALISER)]
         );
-        $definition->addTag(CliExtension::CONTROLLER_TAG, array('priority' => 1));
-        $container->setDefinition(CliExtension::CONTROLLER_TAG . '.failaid.waitOnFailure', $definition);
+        $definition->addTag(CliExtension::CONTROLLER_TAG, ['priority' => 1]);
+        $container->setDefinition(CliExtension::CONTROLLER_TAG.'.failaid.waitOnFailure', $definition);
     }
 
-    private function addFeedbackOnFailureCommand($container)
+    private function addFeedbackOnFailureCommand($container): void
     {
         $definition = new Definition(
             FeedbackOnFailure::class,
-            array(new Reference(self::CONTEXT_INITIALISER))
+            [new Reference(self::CONTEXT_INITIALISER)]
         );
-        $definition->addTag(CliExtension::CONTROLLER_TAG, array('priority' => 1));
-        $container->setDefinition(CliExtension::CONTROLLER_TAG . '.failaid.feedbackOnFailure', $definition);
+        $definition->addTag(CliExtension::CONTROLLER_TAG, ['priority' => 1]);
+        $container->setDefinition(CliExtension::CONTROLLER_TAG.'.failaid.feedbackOnFailure', $definition);
     }
 
     /**
-     *
-     * @return string
+     * @return array<string, mixed>
      */
     private function getScreenshotOptions(array $config)
     {
@@ -210,7 +204,7 @@ class Extension implements ExtensionInterface
             return $config['screenshot'];
         }
 
-        /**
+        /*
          * DEPRECATED, to be removed in next major version bump.
          */
         return [

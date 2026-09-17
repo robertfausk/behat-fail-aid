@@ -1,17 +1,30 @@
-version: '3'
-
 services:
-  tests-php-5.6:
+  php8.3:
     build:
       dockerfile: Dockerfile
       context: .
+      args:
+        PHP_VERSION: 8.3
     volumes:
-      - /app/vendor
       - ./:/app
-  tests-php-7.1:
+      - /app/vendor
+
+  php8.4:
     build:
-      dockerfile: Dockerfile-php-7
+      dockerfile: Dockerfile
       context: .
+      args:
+        PHP_VERSION: 8.4
     volumes:
-      - /app/vendor
       - ./:/app
+      - /app/vendor
+
+  php8.5:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        PHP_VERSION: 8.5
+    volumes:
+      - ./:/app
+      - /app/vendor

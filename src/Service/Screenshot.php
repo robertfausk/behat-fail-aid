@@ -1,23 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FailAid\Service;
 
+use Behat\Mink\Driver\DriverInterface;
 use Behat\Mink\Element\ElementInterface;
 use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Session;
-use Exception;
 use FailAid\Context\Contracts\ScreenshotInterface;
 
-/**
- * Screenshot class.
- */
 class Screenshot implements ScreenshotInterface
 {
-    const SCREENSHOT_MODE_DEFAULT = 'default';
+    public const SCREENSHOT_MODE_DEFAULT = 'default';
 
-    const SCREENSHOT_MODE_PNG = 'png';
+    public const SCREENSHOT_MODE_PNG = 'png';
 
-    const SCREENSHOT_MODE_HTML = 'html';
+    public const SCREENSHOT_MODE_HTML = 'html';
 
     /**
      * @var string
@@ -30,37 +29,41 @@ class Screenshot implements ScreenshotInterface
     public static $screenshotDir;
 
     /**
-     * @var boolean
+     * @var bool
      */
     public static $screenshotAutoClean = false;
 
     /**
-     * @var array
+     * @var array<int, string>
      */
     public static $screenshotSize = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     public static $screenshotHostDirectory;
 
     /**
-     * @var string
+     * @var string|null
      */
     public static $screenshotHostUrl;
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     public static $siteFilters;
 
-    public static function setOptions(array $options, array $siteFilters)
+    /**
+     * @param array<string, mixed>  $options
+     * @param array<string, string> $siteFilters
+     */
+    public static function setOptions(array $options, array $siteFilters): void
     {
         self::$screenshotDir = tempnam(sys_get_temp_dir(), date('Ymd-'));
         self::$screenshotMode = self::SCREENSHOT_MODE_DEFAULT;
 
         if (isset($options['directory'])) {
-            self::$screenshotDir = realpath($options['directory']) . DIRECTORY_SEPARATOR . date('Ymd-');
+            self::$screenshotDir = realpath($options['directory']).\DIRECTORY_SEPARATOR.date('Ymd-');
         }
 
         if (isset($options['mode'])) {
@@ -76,16 +79,16 @@ class Screenshot implements ScreenshotInterface
         }
 
         if (isset($options['hostDirectory'])) {
-            self::$screenshotHostDirectory = rtrim(self::resolveEnvVarsInString($options['hostDirectory']), DIRECTORY_SEPARATOR) .
-                DIRECTORY_SEPARATOR .
+            self::$screenshotHostDirectory = rtrim(self::resolveEnvVarsInString($options['hostDirectory']), \DIRECTORY_SEPARATOR).
+                \DIRECTORY_SEPARATOR.
                 date('Ymd-');
         } else {
             self::$screenshotHostDirectory = null;
         }
 
         if (isset($options['hostUrl'])) {
-            self::$screenshotHostUrl = rtrim(self::resolveEnvVarsInString($options['hostUrl']), DIRECTORY_SEPARATOR) .
-                DIRECTORY_SEPARATOR .
+            self::$screenshotHostUrl = rtrim(self::resolveEnvVarsInString($options['hostUrl']), \DIRECTORY_SEPARATOR).
+                \DIRECTORY_SEPARATOR.
                 date('Ymd-');
         } else {
             self::$screenshotHostUrl = null;
@@ -94,26 +97,15 @@ class Screenshot implements ScreenshotInterface
         self::$siteFilters = $siteFilters;
     }
 
-    public static function resolveEnvVarsInString($string)
+    public static function resolveEnvVarsInString(string $string): string
     {
-        return rtrim(shell_exec("echo $string"), PHP_EOL);
+        return rtrim((string) shell_exec("echo $string"), \PHP_EOL);
     }
 
-    /**
-     * Screenshot based on mode defined. Modes are:
-     * - default: png if possible, html otherwise. Suitable for running packs with both types drivers enabled.
-     * - html: all in html.
-     * - png: all in png, Throws exception if unable to.
-     *
-     * @param Page   $page   The page object.
-     * @param Driver $driver The driver used to run the test.
-     *
-     * @return string
-     */
-    public static function takeScreenshot(ElementInterface $page, $driver)
+    public static function takeScreenshot(ElementInterface $page, DriverInterface $driver): string
     {
-        if (!$page->getOuterHtml()) {
-            throw new Exception('Unable to take screenshot, page content not found.');
+        if (!$page->getHtml()) {
+            throw new \Exception('Unable to take screenshot, page content not found.');
         }
 
         $content = null;
@@ -126,12 +118,12 @@ class Screenshot implements ScreenshotInterface
                     $filename .= '.png';
                     self::handleResize(self::$screenshotSize, $driver);
                 } catch (DriverException $e) {
-                    $content = static::applySiteSpecificFilters($page->getOuterHtml());
+                    $content = static::applySiteSpecificFilters($page->getHtml());
                     $filename .= '.html';
                 }
                 break;
             case self::SCREENSHOT_MODE_HTML:
-                $content = static::applySiteSpecificFilters($page->getOuterHtml());
+                $content = static::applySiteSpecificFilters($page->getHtml());
                 $filename .= '.html';
                 break;
             case self::SCREENSHOT_MODE_PNG:
@@ -140,37 +132,32 @@ class Screenshot implements ScreenshotInterface
                     $content = $driver->getScreenshot();
                     $filename .= '.png';
                 } catch (DriverException $e) {
-                    throw new Exception('unable to produce screenshot: ' . $e->getMessage());
+                    throw new \Exception('unable to produce screenshot: '.$e->getMessage());
                 }
                 break;
         }
 
-        file_put_contents(self::$screenshotDir . $filename, $content);
+        file_put_contents(self::$screenshotDir.$filename, $content);
 
         if (self::$screenshotHostDirectory) {
-            return 'file://' . self::$screenshotHostDirectory . $filename;
+            return 'file://'.self::$screenshotHostDirectory.$filename;
         } elseif (self::$screenshotHostUrl) {
-            return self::$screenshotHostUrl . $filename;
+            return self::$screenshotHostUrl.$filename;
         }
 
-        return 'file://' . self::$screenshotDir . $filename;
+        return 'file://'.self::$screenshotDir.$filename;
     }
 
-    public static function canTakeScreenshot(Session $session)
+    public static function canTakeScreenshot(Session $session): bool
     {
-        if($session->isStarted()) {
+        if ($session->isStarted()) {
             return true;
         }
 
-        throw new Exception('Session has not started yet.');
+        throw new \Exception('Session has not started yet.');
     }
 
-    /**
-     * @param string $content
-     *
-     * @return string
-     */
-    public static function applySiteSpecificFilters($content)
+    public static function applySiteSpecificFilters(string $content): string
     {
         $filters = self::getSiteSpecificFilters();
 
@@ -180,7 +167,10 @@ class Screenshot implements ScreenshotInterface
         return str_replace($from, $to, $content);
     }
 
-    private static function handleResize($size, $driver)
+    /**
+     * @param array<int, string> $size
+     */
+    private static function handleResize(array $size, DriverInterface $driver): void
     {
         if (!$size) {
             return;
@@ -198,9 +188,9 @@ class Screenshot implements ScreenshotInterface
      *     '/js/' => 'http://dev.environment/js/'
      * ]
      *
-     * @return array
+     * @return array<string, string>
      */
-    protected static function getSiteSpecificFilters()
+    protected static function getSiteSpecificFilters(): array
     {
         return self::$siteFilters;
     }

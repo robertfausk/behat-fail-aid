@@ -1,5 +1,17 @@
-Behat Fail Aid ![Master branch](https://github.com/forceedge01/behat-fail-aid/actions/workflows/ci-tests.yaml/badge.svg?branch=master) [![Latest Stable Version](https://poser.pugx.org/genesis/behat-fail-aid/v/stable)](https://packagist.org/packages/genesis/behat-fail-aid) [![Total Downloads](https://poser.pugx.org/genesis/behat-fail-aid/downloads)](https://packagist.org/packages/genesis/behat-fail-aid) [![License](https://poser.pugx.org/genesis/behat-fail-aid/license)](https://packagist.org/packages/genesis/behat-fail-aid) [![Monthly Downloads](https://poser.pugx.org/genesis/behat-fail-aid/d/monthly)](https://packagist.org/packages/genesis/behat-fail-aid) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=forceedge01_behat-fail-aid&metric=alert_status)](https://sonarcloud.io/dashboard?id=forceedge01_behat-fail-aid) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=forceedge01_behat-fail-aid&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=forceedge01_behat-fail-aid) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=forceedge01_behat-fail-aid&metric=security_rating)](https://sonarcloud.io/dashboard?id=forceedge01_behat-fail-aid)
-=======
+Behat Fail Aid
+
+[![CI](https://github.com/robertfausk/behat-fail-aid/actions/workflows/ci-tests.yaml/badge.svg?branch=main)](https://github.com/robertfausk/behat-fail-aid/actions/workflows/ci-tests.yaml)
+[![Latest Stable Version](https://img.shields.io/packagist/v/robertfausk/behat-fail-aid)](https://packagist.org/packages/robertfausk/behat-fail-aid)
+[![Total Downloads](https://img.shields.io/packagist/dt/robertfausk/behat-fail-aid)](https://packagist.org/packages/robertfausk/behat-fail-aid)
+[![Monthly Downloads](https://img.shields.io/packagist/dm/robertfausk/behat-fail-aid)](https://packagist.org/packages/robertfausk/behat-fail-aid)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE.md)
+[![PHP](https://img.shields.io/badge/php-%3E%3D8.3-8892BF)](https://www.php.net/)
+[![Behat](https://img.shields.io/badge/behat-3.5%20%7C%204.0-green)](https://behat.org/)
+
+Upgrading?
+----------
+
+See [UPGRADE.md](UPGRADE.md) for breaking changes and migration instructions.
 
 Introduction
 -------------
@@ -8,13 +20,13 @@ Time and time again we've all seen how difficult and stressful it can become to 
 all possible information around failures and print them as you see a failure taking out the need to do basic investigations with minimal setup.
 
 Usual failure
-![Before](https://raw.githubusercontent.com/forceedge01/behat-fail-aid/master/extras/generic-from.png#version=1)
+![Before](https://raw.githubusercontent.com/robertfausk/behat-fail-aid/master/extras/generic-from.png#version=1)
 
 With fail-aid context
-![After](https://raw.githubusercontent.com/forceedge01/behat-fail-aid/master/extras/generic-to.png#version=1)
+![After](https://raw.githubusercontent.com/robertfausk/behat-fail-aid/master/extras/generic-to.png#version=1)
 
 With config options enabled
-![More info](https://raw.githubusercontent.com/forceedge01/behat-fail-aid/master/extras/max-details.png#version=1)
+![More info](https://raw.githubusercontent.com/robertfausk/behat-fail-aid/master/extras/max-details.png#version=1)
 
 The links are ready to be clicked on and opened in the browser. No faff!
 
@@ -44,7 +56,7 @@ Patch: NA.
 Installation:
 -------------
 ```shell
-composer require genesis/behat-fail-aid --dev
+composer require robertfausk/behat-fail-aid --dev
 ```
 
 CLI
@@ -332,3 +344,74 @@ class FeatureContext
 }
 
 ```
+
+Development
+-----------
+
+### Requirements
+
+- Docker and Docker Compose
+
+### Running the test suite locally
+
+The full matrix (3 PHP versions × 2 Behat scenarios) runs via isolated Docker builds:
+
+```shell
+# Run all 6 combinations (PHP 8.3–8.5 × behat3/behat4)
+make tests
+
+# Quick iteration: PHPUnit unit tests on PHP 8.3 with default deps
+make tests-unit
+
+# Quick iteration: Behat integration tests on PHP 8.3
+make tests-behat
+```
+
+For fast dev iteration against a single PHP version (uses volume mount, no rebuild needed):
+
+```shell
+docker compose run --rm php8.3 ./bin/run-tests.sh
+docker compose run --rm php8.4 ./vendor/bin/phpunit -c tests
+docker compose run --rm php8.5 ./vendor/bin/behat
+```
+
+### Static analysis
+
+```shell
+# PHPStan (level 5)
+make phpstan
+
+# PHP-CS-Fixer check (dry-run)
+make cs
+
+# PHP-CS-Fixer auto-fix
+make cs-fix
+```
+
+### Dependency scenarios
+
+Dependency matrices are managed with [g1a/composer-test-scenarios](https://github.com/g1a/composer-test-scenarios).
+Scenario lock files live in `.scenarios.lock/` and are committed to the repository.
+
+To regenerate after changing `composer.json`:
+
+```shell
+make scenarios-update
+```
+
+### Supported versions
+
+| PHP    | Behat scenario | Status                  |
+|--------|----------------|-------------------------|
+| 8.3    | behat3 (^3.5)  | supported               |
+| 8.3    | behat4 (^4.0)  | supported               |
+| 8.4    | behat3 (^3.5)  | supported               |
+| 8.4    | behat4 (^4.0)  | supported               |
+| 8.5    | behat3 (^3.5)  | supported               |
+| 8.5    | behat4 (^4.0)  | supported               |
+| 8.6    | behat3 (^3.5)  | experimental (nightly)  |
+| 8.6    | behat4 (^4.0)  | experimental (nightly)  |
+
+### CI
+
+GitHub Actions runs the full matrix on every push and pull request. See `.github/workflows/ci-tests.yaml`.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FailAid\Context;
 
 use Behat\Behat\Context\Context;
@@ -11,9 +13,10 @@ use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\MinkExtension\Context\MinkAwareContext;
+use Behat\Step\Given;
 use Behat\Testwork\ServiceContainer\Configuration\ConfigurationLoader;
+use Behat\Testwork\Tester\Result\ExceptionResult;
 use Behat\Testwork\Tester\Result\TestResult;
-use DirectoryIterator;
 use Exception;
 use FailAid\Context\Contracts\DebugBarInterface;
 use FailAid\Context\Contracts\FailStateInterface;
@@ -21,16 +24,12 @@ use FailAid\Service\JSDebug;
 use FailAid\Service\Output;
 use FailAid\Service\Screenshot;
 use FailAid\Service\StaticCallerService;
-use ReflectionObject;
 use Symfony\Component\Console\Input\ArgvInput;
 
-/**
- * Defines application features from the specific context.
- */
 class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarInterface
 {
     /**
-     * @var string
+     * @var string|null
      */
     public $defaultSession;
 
@@ -40,39 +39,34 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     private $mink;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     private $minkParameters;
 
     /**
-     * @var ExceptionDetailsProvider
-     */
-    private $exceptionDetailsProvider;
-
-    /**
-     * @var array
+     * @var array<string, mixed>
      */
     private $debugBarSelectors = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private static $exceptionHash;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     private static $states = [];
 
     /**
-     * @var boolean
+     * @var bool
      */
     private static $cleaned = false;
 
     /**
-     * @var ScenarioEvent
+     * @var ScenarioScope|null
      */
-    private $currentScenario = null;
+    private $currentScenario;
 
     /**
      * @var bool
@@ -80,27 +74,27 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     private static $debugScenario = false;
 
     /**
-     * @var integer
+     * @var int
      */
     private static $waitOnFailure = 0;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private static $autoClean = false;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private static $feedbackOnFailure = false;
 
     /**
-     * @var FeatureContext
+     * @var self|null
      */
     private static $self;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     private $outputOptions = [];
 
@@ -110,13 +104,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     public $staticCaller;
 
     /**
-     * Initializes context.
-     *
-     * Every scenario gets its own context instance.
-     * You can also pass arbitrary arguments to the
-     * context constructor through behat.yml.
-     *
-     * @param array $output Overridable output param for each context.
+     * @param array<string, mixed> $output
      */
     public function __construct(array $output = [])
     {
@@ -124,12 +112,12 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
         self::$self = $this;
     }
 
-    public static function getInstance()
+    public static function getInstance(): ?self
     {
         return self::$self;
     }
 
-    public function setStaticCaller(StaticCallerService $staticCaller)
+    public function setStaticCaller(StaticCallerService $staticCaller): self
     {
         $this->staticCaller = $staticCaller;
 
@@ -137,21 +125,20 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     }
 
     /**
-     * @param mixed  $trackJs
-     * @param string $defaultSession
-     * @param array  $screenshot
-     * @param array  $siteFilters
-     * @param array  $debugBarSelectors
-     * @param array  $options
+     * @param array<string, mixed>  $screenshot
+     * @param array<string, string> $siteFilters
+     * @param array<string, mixed>  $debugBarSelectors
+     * @param array<string, mixed>  $trackJs
+     * @param array<string, mixed>  $outputOptions
      */
     public function setConfig(
         array $screenshot = [],
         array $siteFilters = [],
         array $debugBarSelectors = [],
         array $trackJs = ['errors' => false, 'logs' => false, 'warns' => false, 'trim' => false],
-        $defaultSession = null,
-        array $outputOptions = []
-    ) {
+        ?string $defaultSession = null,
+        array $outputOptions = [],
+    ): void {
         $this->debugBarSelectors = $debugBarSelectors;
         $this->defaultSession = $defaultSession;
         $this->staticCaller->call(Screenshot::class, 'setOptions', [$screenshot, $siteFilters]);
@@ -165,29 +152,25 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
         }
     }
 
-    /**
-     * @Given I take a screenshot
-     */
-    public function iTakeAScreenshot()
+    #[Given('I take a screenshot')]
+    public function iTakeAScreenshot(): void
     {
         $session = $this->getSession();
         try {
             $this->staticCaller->call(Screenshot::class, 'canTakeScreenshot', [$session]);
             $screenshotPath = $this->staticCaller->call(Screenshot::class, 'takeScreenshot', [
                 $session->getPage(),
-                $session->getDriver()
+                $session->getDriver(),
             ]);
 
-            echo '[SCREENSHOT] ' . $screenshotPath;
-        } catch (Exception $e) {
-            echo 'Unable to take screenshot: ' . $e->getMessage();
+            echo '[SCREENSHOT] '.$screenshotPath;
+        } catch (\Exception $e) {
+            echo 'Unable to take screenshot: '.$e->getMessage();
         }
     }
 
-    /**
-     * @Given I gather facts for the current state
-     */
-    public function iGatherFactsForTheCurrentState()
+    #[Given('I gather facts for the current state')]
+    public function iGatherFactsForTheCurrentState(): void
     {
         $session = $this->getSession();
         $driver = $session->getDriver();
@@ -206,9 +189,8 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
      * @BeforeSuite
      *
      * Load the config file again as the context params aren't available until the context is initialised.
-     * @param mixed $arg1
      */
-    public static function autoCleanBeforeTestExecution($arg1)
+    public static function autoCleanBeforeTestExecution($arg1): void
     {
         if (self::$cleaned) {
             return;
@@ -235,9 +217,8 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
 
     /**
      * @BeforeScenario
-     * @param mixed $scenarioEvent
      */
-    public function currentScenario($scenarioEvent)
+    public function currentScenario($scenarioEvent): self
     {
         $this->currentScenario = $scenarioEvent;
 
@@ -247,7 +228,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     /**
      * @BeforeScenario
      */
-    public function refreshStates()
+    public function refreshStates(): void
     {
         self::$states = [];
     }
@@ -255,12 +236,12 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     /**
      * @AfterStep
      */
-    public function takeScenarioScreenShot(AfterStepScope $scope)
+    public function takeScenarioScreenShot(AfterStepScope $scope): void
     {
         if (self::$debugScenario) {
             try {
                 $this->iTakeAScreenshot();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 // Ignore...
             }
         }
@@ -269,29 +250,42 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     /**
      * @AfterStep
      */
-    public function gatherStateFactsAfterFailedStep(AfterStepScope $scope)
+    public function gatherStateFactsAfterFailedStep(AfterStepScope $scope): ?string
     {
-        if ($scope->getTestResult()->getResultCode() === TestResult::FAILED) {
+        if (TestResult::FAILED === $scope->getTestResult()->getResultCode()) {
             try {
                 $message = null;
+                $testResult = $scope->getTestResult();
+
+                if (!$testResult instanceof ExceptionResult) {
+                    self::$exceptionHash = null;
+
+                    return null;
+                }
+
+                $exception = $testResult->getException();
+                if (null === $exception) {
+                    self::$exceptionHash = null;
+
+                    return null;
+                }
 
                 // To get away from appending exception details multiple times in one lifecycle
                 // of a test suite - we need to make sure the exception thrown is different
                 // from the previous one before working with it. This happens because each scenario
                 // initialises new context files but the exception remains the same, and each context
                 // goes through the afterStep.
-                $objectHash = spl_object_hash($scope->getTestResult()->getException());
+                $objectHash = spl_object_hash($exception);
                 if (self::$exceptionHash !== $objectHash) {
                     self::$exceptionHash = $objectHash;
-                    $exception = $scope->getTestResult()->getException();
 
                     $message = '';
                     if (!$this->staticCaller->call(Output::class, 'getOption', ['api'])) {
                         if ($this->staticCaller->call(Output::class, 'getOption', ['screenshot'])) {
                             try {
-                                $this->getSession()->getPage()->getOuterHtml();
+                                $this->getSession()->getPage()->getHtml();
                             } catch (\WebDriver\Exception\NoSuchElement $e) {
-                                $message = PHP_EOL . PHP_EOL . 'The page is blank, is the driver/browser ready to receive the request?';
+                                $message = \PHP_EOL.\PHP_EOL.'The page is blank, is the driver/browser ready to receive the request?';
                             }
                         }
 
@@ -324,7 +318,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
                             null,
                             null,
                             null,
-                            $this->currentScenario
+                            $this->currentScenario,
                         ]);
                     }
 
@@ -337,28 +331,30 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
                 }
 
                 if (self::$waitOnFailure) {
-                    echo sprintf('Waiting on failure for %d seconds', self::$waitOnFailure) . PHP_EOL;
+                    echo \sprintf('Waiting on failure for %d seconds', self::$waitOnFailure).\PHP_EOL;
                 }
 
                 if (self::$feedbackOnFailure) {
-                    echo PHP_EOL . '-- FAIL --' . PHP_EOL . $exception->getMessage();
+                    echo \PHP_EOL.'-- FAIL --'.\PHP_EOL.$exception->getMessage();
                     ob_flush();
                 }
 
                 return $message;
             } catch (DriverException $e) {
                 // The driver is not available, dont fail - allow behat to print out the actual error message.
-                echo 'Error message: ' . $e->getMessage();
+                echo 'Error message: '.$e->getMessage();
             }
         }
 
         self::$exceptionHash = null;
+
+        return null;
     }
 
     /**
      * @AfterScenario
      */
-    public function waitOnFailure()
+    public function waitOnFailure(): void
     {
         if (self::$exceptionHash) {
             if (self::$waitOnFailure) {
@@ -367,110 +363,90 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
         }
     }
 
-    public static function setDebugScenario($bool)
+    public static function setDebugScenario(bool $bool): void
     {
         self::$debugScenario = $bool;
     }
 
-    public static function setWaitOnFailure($time)
+    public static function setWaitOnFailure(int $time): void
     {
         self::$waitOnFailure = (int) $time;
     }
 
-    public static function setFeedbackOnFailure($bool)
+    public static function setFeedbackOnFailure(bool $bool): void
     {
         self::$feedbackOnFailure = $bool;
     }
 
-    public static function clearDir($directory)
+    public static function clearDir(string $directory): void
     {
         $extensions = ['png', 'html'];
-        foreach (new DirectoryIterator($directory) as $file) {
-            if ($file->isFile() && in_array($file->getExtension(), $extensions)) {
-                unlink($directory . DIRECTORY_SEPARATOR . $file->getFilename());
+        foreach (new \DirectoryIterator($directory) as $file) {
+            if ($file->isFile() && \in_array($file->getExtension(), $extensions)) {
+                unlink($directory.\DIRECTORY_SEPARATOR.$file->getFilename());
             }
         }
     }
 
-    public static function setAutoClean($bool)
+    public static function setAutoClean(bool $bool): void
     {
         self::$autoClean = $bool;
     }
 
-    /**
-     * Get the behat.yml config path from provided cli path or the default expected location.
-     *
-     * @return string
-     */
-    private static function getConfigFilePath()
+    private static function getConfigFilePath(): string
     {
         $input = new ArgvInput();
         $path = $input->getParameterOption(['-c', '--config'], 'behat.yml');
         $basePath = '';
 
-        // If the path provided isn't an absolute path, then find the folder it is in recursively.
-        if (substr($path, 0, 1) !== '/') {
-            $basePath = self::getBasePathForFile($path, getcwd()) . DIRECTORY_SEPARATOR;
+        if ('/' !== substr($path, 0, 1)) {
+            $basePath = self::getBasePathForFile($path, (string) getcwd()).\DIRECTORY_SEPARATOR;
         }
 
-        $configFile = $basePath . $path;
+        $configFile = $basePath.$path;
 
         if (!file_exists($configFile)) {
-            throw new Exception(
-                "Autoclean: Config file '$path' not found at base path: '$basePath',
-                please pass in the path to the config file through the -c flag and check permissions."
-            );
+            throw new \Exception("Autoclean: Config file '$path' not found at base path: '$basePath',
+                please pass in the path to the config file through the -c flag and check permissions.");
         }
 
         return $configFile;
     }
 
-    /**
-     * @param string $file
-     * @param string $path
-     *
-     * @return string
-     */
-    private static function getBasePathForFile($file, $path)
+    private static function getBasePathForFile(string $file, string $path): string
     {
-        if (!file_exists($path . DIRECTORY_SEPARATOR . $file)) {
-            $chunks = explode(DIRECTORY_SEPARATOR, $path);
+        if (!file_exists($path.\DIRECTORY_SEPARATOR.$file)) {
+            $chunks = explode(\DIRECTORY_SEPARATOR, $path);
 
-            if (null === array_pop($chunks) || !$path) {
-                throw new Exception($file . ' not found in hierarchy of directory.');
+            array_pop($chunks);
+            if (!$path) {
+                throw new \Exception($file.' not found in hierarchy of directory.');
             }
 
-            $path = implode(DIRECTORY_SEPARATOR, $chunks);
-            echo $path . PHP_EOL;
+            $path = implode(\DIRECTORY_SEPARATOR, $chunks);
+            echo $path.\PHP_EOL;
             self::getBasePathForFile($file, $path);
         }
 
         return $path;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return Session
-     */
-    private function getSession($name = null)
+    private function getSession(?string $name = null): Session
     {
-        return $this->getMink()->getSession($name ? $name : $this->defaultSession);
+        return $this->getMink()->getSession($name ?? $this->defaultSession);
     }
 
     /**
-     * @return string
-     * @param  mixed  $featureFile
-     * @param  mixed  $exceptionFile
+     * @param array<string, mixed> $debugBarSelectors
      */
     private function gatherFacts(
         Session $session,
         DriverInterface $driver,
         array $debugBarSelectors,
-        $featureFile,
-        $exceptionFile,
-        ScenarioScope $scenario
-    ) {
+        ?string $featureFile,
+        ?string $exceptionFile,
+        ?ScenarioScope $scenario,
+    ): string {
         $message = null;
         $driver = $session->getDriver();
 
@@ -478,8 +454,8 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
         if ($this->staticCaller->call(Output::class, 'getOption', ['url'])) {
             try {
                 $currentUrl = $session->getCurrentUrl();
-            } catch (Exception $e) {
-                $currentUrl = 'Unable to fetch current url, error: ' . $e->getMessage();
+            } catch (\Exception $e) {
+                $currentUrl = 'Unable to fetch current url, error: '.$e->getMessage();
             }
         }
 
@@ -488,7 +464,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
             try {
                 $statusCode = $session->getStatusCode();
             } catch (DriverException $e) {
-                $statusCode = 'Unable to fetch status code, error: ' . $e->getMessage();
+                $statusCode = 'Unable to fetch status code, error: '.$e->getMessage();
             }
         }
 
@@ -498,11 +474,10 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
                 $this->staticCaller->call(Screenshot::class, 'canTakeScreenshot', [$session]);
                 $screenshotPath = $this->staticCaller->call(Screenshot::class, 'takeScreenshot', [
                     $session->getPage(),
-                    $driver
+                    $driver,
                 ]);
-            } catch (Exception $e) {
-                // Doesn't work.
-                $screenshotPath = 'Unable to produce screenshot: ' . $e->getMessage();
+            } catch (\Exception $e) {
+                $screenshotPath = 'Unable to produce screenshot: '.$e->getMessage();
             }
         }
 
@@ -514,8 +489,8 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
                         $debugBarSelectors,
                         $session->getPage()
                     );
-                } catch (Exception $e) {
-                    $debugBarDetails = 'Unable to capture debug bar details: ' . $e->getMessage();
+                } catch (\Exception $e) {
+                    $debugBarDetails = 'Unable to capture debug bar details: '.$e->getMessage();
                 }
             }
         }
@@ -534,133 +509,103 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
             $jsErrors,
             $jsLogs,
             $jsWarns,
-            get_class($driver),
-            $scenario
+            $driver::class,
+            $scenario,
         ]);
 
-        return $message;
+        return (string) $message;
     }
 
-
-    public function setMink(Mink $mink)
+    public function setMink(Mink $mink): void
     {
         $this->mink = $mink;
-
-        return $this;
     }
 
-
-    public function setMinkParameters(array $parameters)
+    public function setMinkParameters(array $parameters): void
     {
         $this->minkParameters = $parameters;
-
-        return $this;
     }
 
-    /**
-     * @return Mink
-     */
-    public function getMink()
+    public function getMink(): Mink
     {
         return $this->mink;
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getMinkParameters()
+    public function getMinkParameters(): array
     {
         return $this->minkParameters;
     }
 
     /**
-     * @param string     $name
      * @param string|int $value
      */
-    public static function addState($name, $value)
+    public static function addState(string $name, $value): void
     {
         self::$states[$name] = $value;
     }
 
-    /**
-     * @param string $name
-     * @param string $value
-     *
-     * @return string
-     */
-    public static function getState($name, $default = null)
+    public static function getState(string $name, $default = null)
     {
         return isset(self::$states[$name]) ? self::$states[$name] : $default;
     }
 
     /**
-     * Override if gathering details is complex.
-     *
-     * @return string
+     * @param array<string, mixed> $debugBarSelectors
      */
-    public function gatherDebugBarDetails(array $debugBarSelectors, DocumentElement $page)
+    public function gatherDebugBarDetails(array $debugBarSelectors, DocumentElement $page): string
     {
         $details = '';
         foreach ($debugBarSelectors as $name => $selector) {
-            $details .= '  [' . strtoupper($name) . '] ';
-            if (is_array($selector)) {
+            $details .= '  ['.strtoupper($name).'] ';
+            if (\is_array($selector)) {
                 if (!isset($selector['callback'])) {
-                    throw new Exception('Debug bar selector if array must have callback specified.');
+                    throw new \Exception('Debug bar selector if array must have callback specified.');
                 }
-                list($class, $method) = explode('::', $selector['callback'], 2);
+                [$class, $method] = explode('::', $selector['callback'], 2);
                 $details .= $class::$method($page);
             } elseif ($detailText = $page->find('css', $selector)) {
                 $details .= $detailText->getText();
             } else {
-                $details .= 'Element "' . $selector . '" Not Found.';
+                $details .= 'Element "'.$selector.'" Not Found.';
             }
-            $details .= PHP_EOL;
+            $details .= \PHP_EOL;
         }
 
         return $details;
     }
 
     /**
-     *
-     * @return string
+     * @param array<string, mixed> $states
      */
-    public function getStateDetails(array $states)
+    public function getStateDetails(array $states): string
     {
         $stateDetails = '';
         foreach ($states as $stateName => $stateValue) {
-            $stateDetails .= '  [' . strtoupper($stateName) . '] ' . $stateValue . PHP_EOL;
+            $stateDetails .= '  ['.strtoupper($stateName).'] '.$stateValue.\PHP_EOL;
         }
 
         return $stateDetails;
     }
 
-    /**
-     * @param string $message      The message to append the details onto.
-     * @param string $stateDetails The state details.
-     *
-     * @return string
-     */
-    private function addStateDetails($message, $stateDetails)
+    private function addStateDetails(?string $message, string $stateDetails): string
     {
         if ($stateDetails) {
-            $message .= PHP_EOL . '[STATE]' . PHP_EOL;
+            $message .= \PHP_EOL.'[STATE]'.\PHP_EOL;
             $message .= $stateDetails;
         }
 
-        $message .= PHP_EOL;
+        $message .= \PHP_EOL;
 
-        return $message;
+        return (string) $message;
     }
 
-    /**
-     * @param Exception $exception The original exception.
-     * @param mixed     $message
-     */
-    private function setAdditionalExceptionDetailsInException(Exception $exception, $message)
+    private function setAdditionalExceptionDetailsInException(\Throwable $exception, ?string $message): void
     {
-        $reflectionObject = new ReflectionObject($exception);
+        $reflectionObject = new \ReflectionObject($exception);
         $reflectionObjectProp = $reflectionObject->getProperty('message');
-        $reflectionObjectProp->setAccessible(true);
-        $reflectionObjectProp->setValue($exception, $exception->getMessage() . $message);
+        $reflectionObjectProp->setValue($exception, $exception->getMessage().$message);
     }
 }

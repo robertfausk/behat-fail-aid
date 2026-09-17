@@ -1,16 +1,39 @@
-install: composer.lock
-	docker-compose run --rm tests-php-5.6 composer install
-
 .PHONY: update
 update:
-	docker-compose run --rm tests-php-5.6 composer update
+	docker compose run --rm php8.3 composer update
+
+.PHONY: scenarios-update
+scenarios-update:
+	docker compose run --rm php8.3 sh -c "git config --global --add safe.directory /app && composer install -q && composer scenario:update"
 
 .PHONY: tests
 tests:
-	docker-compose run --rm tests-php-5.6
-	docker-compose run --rm tests-php-7.1
+	@for php in 8.3 8.4 8.5; do \
+		for scenario in behat3 behat4; do \
+			echo "=== PHP $$php / $$scenario ==="; \
+			docker build --build-arg PHP_VERSION=$$php --build-arg SCENARIO=$$scenario \
+				-t behat-fail-aid:$$php-$$scenario . \
+				&& docker run --rm behat-fail-aid:$$php-$$scenario ./bin/run-tests.sh \
+				|| exit 1; \
+		done; \
+	done
 
-.PHONY: run
-run:
-	docker-compose run --rm tests-php-5.6 ./vendor/bin/behat
-	docker-compose run --rm tests-php-7.1 ./vendor/bin/behat
+.PHONY: tests-unit
+tests-unit:
+	docker compose run --rm php8.3 composer tests:unit
+
+.PHONY: tests-behat
+tests-behat:
+	docker compose run --rm php8.3 composer tests:behat
+
+.PHONY: phpstan
+phpstan:
+	docker compose run --rm php8.3 sh -c "git config --global --add safe.directory /app && composer install -q && ./vendor/bin/phpstan analyse"
+
+.PHONY: cs
+cs:
+	docker compose run --rm php8.3 sh -c "git config --global --add safe.directory /app && composer install -q && ./vendor/bin/php-cs-fixer fix --dry-run --diff"
+
+.PHONY: cs-fix
+cs-fix:
+	docker compose run --rm php8.3 sh -c "git config --global --add safe.directory /app && composer install -q && ./vendor/bin/php-cs-fixer fix"
