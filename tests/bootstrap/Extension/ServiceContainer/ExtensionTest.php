@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FailAid\Tests\Extension\ServiceContainer;
 
 use FailAid\Extension\ServiceContainer\Extension;
@@ -19,6 +21,7 @@ class ExtensionConfiguration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('FailAidExtension');
         (new Extension())->configure($treeBuilder->getRootNode());
+
         return $treeBuilder;
     }
 }
@@ -34,12 +37,12 @@ class ExtensionTest extends TestCase
 
     // --- configure() / config tree tests ---
 
-    public function testDefaultConfigIsValid(): void
+    public function test_default_config_is_valid(): void
     {
         $this->assertConfigurationIsValid([[]]);
     }
 
-    public function testDefaultOutputOptions(): void
+    public function test_default_output_options(): void
     {
         $this->assertProcessedConfigurationEquals([[]], [
             'screenshot' => [
@@ -74,7 +77,7 @@ class ExtensionTest extends TestCase
         ]);
     }
 
-    public function testCustomScreenshotOptions(): void
+    public function test_custom_screenshot_options(): void
     {
         $this->assertProcessedConfigurationEquals([
             [
@@ -119,7 +122,7 @@ class ExtensionTest extends TestCase
         ]);
     }
 
-    public function testApiModeOption(): void
+    public function test_api_mode_option(): void
     {
         $this->assertProcessedConfigurationEquals(
             [['output' => ['api' => true]]],
@@ -157,7 +160,7 @@ class ExtensionTest extends TestCase
         );
     }
 
-    public function testDebugBarSelectorsAreAccepted(): void
+    public function test_debug_bar_selectors_are_accepted(): void
     {
         $this->assertConfigurationIsValid([[
             'debugBarSelectors' => [
@@ -167,7 +170,7 @@ class ExtensionTest extends TestCase
         ]]);
     }
 
-    public function testSiteFiltersAreAccepted(): void
+    public function test_site_filters_are_accepted(): void
     {
         $this->assertConfigurationIsValid([[
             'siteFilters' => [
@@ -177,7 +180,7 @@ class ExtensionTest extends TestCase
         ]]);
     }
 
-    public function testTrackJsOptions(): void
+    public function test_track_js_options(): void
     {
         $this->assertProcessedConfigurationEquals(
             [['trackJs' => ['errors' => true, 'warns' => true, 'trim' => 50]]],
@@ -226,10 +229,11 @@ class ExtensionTest extends TestCase
 
         $container = new ContainerBuilder();
         (new Extension())->load($container, $processedConfig);
+
         return $container;
     }
 
-    public function testLoadSetsDefaultOutputParameter(): void
+    public function test_load_sets_default_output_parameter(): void
     {
         $container = $this->loadExtension();
 
@@ -241,7 +245,7 @@ class ExtensionTest extends TestCase
         $this->assertTrue($output['debugBarSelectors']);
     }
 
-    public function testLoadSetsScreenshotParameterFromScreenshotNode(): void
+    public function test_load_sets_screenshot_parameter_from_screenshot_node(): void
     {
         $container = $this->loadExtension([
             'screenshot' => ['directory' => '/tmp/shots', 'mode' => 'png'],
@@ -252,14 +256,14 @@ class ExtensionTest extends TestCase
         $this->assertSame('png', $screenshot['mode']);
     }
 
-    public function testLoadSetsEmptyDebugBarSelectorsWhenNotProvided(): void
+    public function test_load_sets_empty_debug_bar_selectors_when_not_provided(): void
     {
         $container = $this->loadExtension();
 
         $this->assertSame([], $container->getParameter('failaid.config.debugBarSelectors'));
     }
 
-    public function testLoadSetsDebugBarSelectorsParameter(): void
+    public function test_load_sets_debug_bar_selectors_parameter(): void
     {
         $container = $this->loadExtension([
             'debugBarSelectors' => ['msg' => '.bar .msg', 'queries' => '.bar .queries'],
@@ -270,7 +274,7 @@ class ExtensionTest extends TestCase
         $this->assertSame('.bar .queries', $selectors['queries']);
     }
 
-    public function testLoadSetsSiteFiltersParameter(): void
+    public function test_load_sets_site_filters_parameter(): void
     {
         $container = $this->loadExtension([
             'siteFilters' => ['/js/' => 'http://cdn.example.com/js/'],
@@ -280,7 +284,7 @@ class ExtensionTest extends TestCase
         $this->assertSame('http://cdn.example.com/js/', $filters['/js/']);
     }
 
-    public function testLoadSetsTrackJsParameter(): void
+    public function test_load_sets_track_js_parameter(): void
     {
         $container = $this->loadExtension([
             'trackJs' => ['errors' => true, 'trim' => 50],
@@ -291,7 +295,7 @@ class ExtensionTest extends TestCase
         $this->assertSame(50, $trackJs['trim']);
     }
 
-    public function testLoadSetsDefaultSessionParameter(): void
+    public function test_load_sets_default_session_parameter(): void
     {
         $container = $this->loadExtension(['defaultSession' => 'javascript']);
 
@@ -301,14 +305,14 @@ class ExtensionTest extends TestCase
         );
     }
 
-    public function testLoadRegistersContextInitialiser(): void
+    public function test_load_registers_context_initialiser(): void
     {
         $container = $this->loadExtension();
 
         $this->assertTrue($container->hasDefinition(Extension::CONTEXT_INITIALISER));
     }
 
-    public function testLoadRegistersCliCommands(): void
+    public function test_load_registers_cli_commands(): void
     {
         $container = $this->loadExtension();
 

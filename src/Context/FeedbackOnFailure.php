@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FailAid\Context;
 
 use Behat\Testwork\Cli\Controller;
@@ -8,33 +10,19 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * FeedbackOnFailure class.
- */
-class FeedbackOnFailure
+class FeedbackOnFailure implements Controller
 {
-    /**
-     * Configures command to be executable by the controller.
-     *
-     * @param SymfonyCommand $command
-     */
-    public function configure(SymfonyCommand $command)
+    public function configure(SymfonyCommand $command): void
     {
         $command->addOption('--feedback-on-failure', null, InputOption::VALUE_NONE, 'Display failure information after failure, used when running tets in progress format.');
     }
 
-    /**
-     * Executes controller.
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return null|integer
-     */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): ?int
     {
         if ($input->getOption('feedback-on-failure')) {
             FailureContext::setFeedbackOnFailure(true);
         }
+
+        return null;
     }
 }

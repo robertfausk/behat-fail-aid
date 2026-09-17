@@ -25,3 +25,15 @@ tests-unit:
 .PHONY: tests-behat
 tests-behat:
 	docker compose run --rm php8.3 composer tests:behat
+
+.PHONY: phpstan
+phpstan:
+	docker compose run --rm php8.3 sh -c "git config --global --add safe.directory /app && composer install -q && ./vendor/bin/phpstan analyse"
+
+.PHONY: cs
+cs:
+	docker compose run --rm php8.3 sh -c "git config --global --add safe.directory /app && composer install -q && ./vendor/bin/php-cs-fixer fix --dry-run --diff"
+
+.PHONY: cs-fix
+cs-fix:
+	docker compose run --rm php8.3 sh -c "git config --global --add safe.directory /app && composer install -q && ./vendor/bin/php-cs-fixer fix"

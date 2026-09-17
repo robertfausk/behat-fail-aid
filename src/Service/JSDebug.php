@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FailAid\Service;
 
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\Mink\Session;
-use Exception;
 
 /**
  * JSDebug class.
@@ -16,7 +17,7 @@ class JSDebug
      */
     private static $trackJs;
 
-    public static function setOptions(array $trackJs)
+    public static function setOptions(array $trackJs): void
     {
         self::$trackJs = $trackJs;
     }
@@ -55,8 +56,8 @@ class JSDebug
             }
         } catch (UnsupportedDriverActionException $e) {
             // ignore...
-        } catch (Exception $e) {
-            $content = [sprintf('Unable to fetch js %s: %s', $type, $e->getMessage())];
+        } catch (\Exception $e) {
+            $content = [\sprintf('Unable to fetch js %s: %s', $type, $e->getMessage())];
         }
 
         return $content;
@@ -64,21 +65,16 @@ class JSDebug
 
     /**
      * @return array
-     * @param  mixed $type
      */
     private static function getJSFromPage($type, Session $session)
     {
-        $var = sprintf('window.js%s', ucfirst($type));
+        $var = \sprintf('window.js%s', ucfirst($type));
 
-        if ($session->evaluateScript(sprintf('typeof %s', $var)) === 'undefined') {
-            throw new Exception(sprintf(
-                'JS %s enabled but %s is undefined, please check implementation and on page load js errors.',
-                $type,
-                $var
-            ));
+        if ('undefined' === $session->evaluateScript(\sprintf('typeof %s', $var))) {
+            throw new \Exception(\sprintf('JS %s enabled but %s is undefined, please check implementation and on page load js errors.', $type, $var));
         }
 
-        $errors = $session->evaluateScript('return ' . $var);
+        $errors = $session->evaluateScript('return '.$var);
 
         return empty($errors) ? [] : $errors;
     }
@@ -90,7 +86,7 @@ class JSDebug
      */
     private static function trimArrayMessages(array $messages, $length)
     {
-        array_walk($messages, function (&$msg) use ($length) {
+        array_walk($messages, static function (&$msg) use ($length) {
             $msg = substr($msg, 0, $length);
         });
 

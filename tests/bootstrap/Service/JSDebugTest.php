@@ -1,16 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FailAid\Tests\Context;
 
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\Mink\Session;
-use Exception;
 use FailAid\Service\JSDebug;
 use PHPUnit\Framework\TestCase;
 
 class JSDebugTest extends TestCase
 {
-    public function testGetJsLogs()
+    public function test_get_js_logs(): void
     {
         $expectedResult = ['A console log output goes longer than twenty characters', 'another console log output'];
 
@@ -28,7 +29,7 @@ class JSDebugTest extends TestCase
         self::assertEquals('another console log ', $result[1]);
     }
 
-    public function testGetJsLogsImplementationError()
+    public function test_get_js_logs_implementation_error(): void
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $session->expects($this->once())
@@ -43,7 +44,7 @@ class JSDebugTest extends TestCase
         self::assertEquals(['Unable to fetch js logs: JS logs enabled but window.jsLogs is undefined, please check implementation and on page load js errors.'], $result);
     }
 
-    public function testGetJsLogsUnsupportedDriverAction()
+    public function test_get_js_logs_unsupported_driver_action(): void
     {
         $exception = $this->getMockBuilder(UnsupportedDriverActionException::class)->disableOriginalConstructor()->getMock();
 
@@ -59,10 +60,10 @@ class JSDebugTest extends TestCase
         self::assertEquals([], $result);
     }
 
-    public function testGetJsLogsAnotherException()
+    public function test_get_js_logs_another_exception(): void
     {
         $message = 'Something went terribly wrong...';
-        $exception = new Exception($message);
+        $exception = new \Exception($message);
 
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $session->expects($this->any())
@@ -73,10 +74,10 @@ class JSDebugTest extends TestCase
         $result = JSDebug::getJsLogs($session);
 
         self::assertIsArray($result);
-        self::assertEquals(['Unable to fetch js logs: ' . $message], $result);
+        self::assertEquals(['Unable to fetch js logs: '.$message], $result);
     }
 
-    public function testGetJsWarns()
+    public function test_get_js_warns(): void
     {
         $expectedResult = ['A console log output goes longer than twenty characters', 'another console log output'];
 
@@ -94,7 +95,7 @@ class JSDebugTest extends TestCase
         self::assertEquals('another console log ', $result[1]);
     }
 
-    public function testGetJsWarnsImplementationError()
+    public function test_get_js_warns_implementation_error(): void
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $session->expects($this->once())
@@ -109,7 +110,7 @@ class JSDebugTest extends TestCase
         self::assertEquals(['Unable to fetch js warns: JS warns enabled but window.jsWarns is undefined, please check implementation and on page load js errors.'], $result);
     }
 
-    public function testGetJsWarnsUnsupportedDriverAction()
+    public function test_get_js_warns_unsupported_driver_action(): void
     {
         $exception = $this->getMockBuilder(UnsupportedDriverActionException::class)->disableOriginalConstructor()->getMock();
 
@@ -125,10 +126,10 @@ class JSDebugTest extends TestCase
         self::assertEquals([], $result);
     }
 
-    public function testGetJsWarnsAnotherException()
+    public function test_get_js_warns_another_exception(): void
     {
         $message = 'Something went terribly wrong...';
-        $exception = new Exception($message);
+        $exception = new \Exception($message);
 
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $session->expects($this->any())
@@ -139,10 +140,10 @@ class JSDebugTest extends TestCase
         $result = JSDebug::getJsWarns($session);
 
         self::assertIsArray($result);
-        self::assertEquals(['Unable to fetch js warns: ' . $message], $result);
+        self::assertEquals(['Unable to fetch js warns: '.$message], $result);
     }
 
-    public function testGetJsErrors()
+    public function test_get_js_errors(): void
     {
         $expectedResult = ['A console log output goes longer than twenty characters', 'another console log output'];
 
@@ -160,7 +161,7 @@ class JSDebugTest extends TestCase
         self::assertEquals('another console log ', $result[1]);
     }
 
-    public function testGetJsErrorsImplementationError()
+    public function test_get_js_errors_implementation_error(): void
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $session->expects($this->once())
@@ -175,7 +176,7 @@ class JSDebugTest extends TestCase
         self::assertEquals(['Unable to fetch js errors: JS errors enabled but window.jsErrors is undefined, please check implementation and on page load js errors.'], $result);
     }
 
-    public function testGetJsErrorsUnsupportedDriverAction()
+    public function test_get_js_errors_unsupported_driver_action(): void
     {
         $exception = $this->getMockBuilder(UnsupportedDriverActionException::class)->disableOriginalConstructor()->getMock();
 
@@ -191,10 +192,10 @@ class JSDebugTest extends TestCase
         self::assertEquals([], $result);
     }
 
-    public function testGetJsErrorsAnotherException()
+    public function test_get_js_errors_another_exception(): void
     {
         $message = 'Something went terribly wrong...';
-        $exception = new Exception($message);
+        $exception = new \Exception($message);
 
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $session->expects($this->any())
@@ -205,6 +206,6 @@ class JSDebugTest extends TestCase
         $result = JSDebug::getJsErrors($session);
 
         self::assertIsArray($result);
-        self::assertEquals(['Unable to fetch js errors: ' . $message], $result);
+        self::assertEquals(['Unable to fetch js errors: '.$message], $result);
     }
 }

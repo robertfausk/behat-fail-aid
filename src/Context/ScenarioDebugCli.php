@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FailAid\Context;
 
 use Behat\Testwork\Cli\Controller;
@@ -15,8 +17,6 @@ class ScenarioDebugCli implements Controller
 {
     /**
      * Configures command to be executable by the controller.
-     *
-     * @param SymfonyCommand $command
      */
     public function configure(SymfonyCommand $command): void
     {
@@ -25,16 +25,13 @@ class ScenarioDebugCli implements Controller
 
     /**
      * Executes controller.
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return null|integer
      */
     public function execute(InputInterface $input, OutputInterface $output): ?int
     {
         if ($input->getOption('scenario-debug')) {
             FailureContext::setDebugScenario(true);
         }
+
+        return null;
     }
 }

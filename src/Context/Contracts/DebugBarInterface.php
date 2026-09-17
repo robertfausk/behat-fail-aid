@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FailAid\Context\Contracts;
 
 use Behat\Mink\Element\DocumentElement;
@@ -11,9 +13,6 @@ interface DebugBarInterface
 {
     /**
      * Override if gathering details is complex.
-     *
-     * @param array $debugBarSelectors
-     * @param DocumentElement $page
      *
      * @return string
      */

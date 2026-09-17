@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FailAid\Extension\Initializer;
 
 use Behat\Behat\Context\Context;
@@ -30,7 +32,7 @@ class Initializer implements ContextInitializer
         array $debugBarSelectors = [],
         array $trackJs = [],
         $defaultSession = null,
-        array $output = []
+        array $output = [],
     ) {
         $this->screenshot = $screenshot;
         $this->siteFilters = $siteFilters;
@@ -40,9 +42,6 @@ class Initializer implements ContextInitializer
         $this->output = $output;
     }
 
-    /**
-     * @param Context $context
-     */
     public function initializeContext(Context $context): void
     {
         if ($context instanceof FailureContext) {
