@@ -375,6 +375,19 @@ docker compose run --rm php8.4 ./vendor/bin/phpunit -c tests
 docker compose run --rm php8.5 ./vendor/bin/behat
 ```
 
+### Static analysis
+
+```shell
+# PHPStan (level 5)
+make phpstan
+
+# PHP-CS-Fixer check (dry-run)
+make cs
+
+# PHP-CS-Fixer auto-fix
+make cs-fix
+```
+
 ### Dependency scenarios
 
 Dependency matrices are managed with [g1a/composer-test-scenarios](https://github.com/g1a/composer-test-scenarios).
