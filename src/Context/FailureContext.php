@@ -13,6 +13,7 @@ use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\MinkExtension\Context\MinkAwareContext;
+use Behat\Step\Given;
 use Behat\Testwork\ServiceContainer\Configuration\ConfigurationLoader;
 use Behat\Testwork\Tester\Result\ExceptionResult;
 use Behat\Testwork\Tester\Result\TestResult;
@@ -151,9 +152,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
         }
     }
 
-    /**
-     * @Given I take a screenshot
-     */
+    #[Given('I take a screenshot')]
     public function iTakeAScreenshot(): void
     {
         $session = $this->getSession();
@@ -170,9 +169,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
         }
     }
 
-    /**
-     * @Given I gather facts for the current state
-     */
+    #[Given('I gather facts for the current state')]
     public function iGatherFactsForTheCurrentState(): void
     {
         $session = $this->getSession();

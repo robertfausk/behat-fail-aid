@@ -1,6 +1,7 @@
 <?php
 
 use Behat\Behat\Context\Context;
+use Behat\Step\Given;
 use FailAid\Context\FailureContext;
 
 /**
@@ -20,9 +21,7 @@ class FeatureContext implements Context
 
     }
 
-    /**
-     * @Given I record the state of the user
-     */
+    #[Given('I record the state of the user')]
     public function iRecordTheStateOfTheUser()
     {
         FailureContext::addState('user email', 'its.inevitable@hotmail.com');

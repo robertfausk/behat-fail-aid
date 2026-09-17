@@ -63,7 +63,7 @@ jobs:
 
       - name: Run Behat
         run: |
-          OUTPUT=$(./vendor/bin/behat --no-colors 2>&1)
+          OUTPUT=$(./vendor/bin/behat --no-colors 2>&1) || true
           echo "$OUTPUT"
           # fail.feature contains 1 intentionally failing scenario run across 3 suites = 3 expected failures
           echo "$OUTPUT" | grep -q "9 scenarios (6 passed, 3 failed)" \

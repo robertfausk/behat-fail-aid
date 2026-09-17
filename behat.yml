@@ -44,8 +44,8 @@ default:
         logs: true
         trim: 1000
     Behat\MinkExtension:
-      default_session: goutte
+      default_session: browserkit_http
       base_url: 'http://localhost:8531/'
       sessions:
-        goutte:
-          goutte: ~
+        browserkit_http:
+          browserkit_http: ~
