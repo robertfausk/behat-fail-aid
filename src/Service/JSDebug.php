@@ -12,37 +12,41 @@ use Behat\Mink\Session;
  */
 class JSDebug
 {
-    /**
-     * @var array
-     */
-    private static $trackJs;
+    /** @var array<string, mixed> */
+    private static array $trackJs;
 
+    /** @param array<string, mixed> $trackJs */
     public static function setOptions(array $trackJs): void
     {
         self::$trackJs = $trackJs;
     }
 
-    public static function getOptions()
+    /** @return array<string, mixed> */
+    public static function getOptions(): array
     {
         return self::$trackJs;
     }
 
-    public static function getJsErrors(Session $session)
+    /** @return array<string> */
+    public static function getJsErrors(Session $session): array
     {
         return self::handleRetrieval('errors', $session);
     }
 
-    public static function getJsLogs(Session $session)
+    /** @return array<string> */
+    public static function getJsLogs(Session $session): array
     {
         return self::handleRetrieval('logs', $session);
     }
 
-    public static function getJsWarns(Session $session)
+    /** @return array<string> */
+    public static function getJsWarns(Session $session): array
     {
         return self::handleRetrieval('warns', $session);
     }
 
-    private static function handleRetrieval($type, Session $session)
+    /** @return array<string> */
+    private static function handleRetrieval(string $type, Session $session): array
     {
         $content = [];
         try {
@@ -50,9 +54,8 @@ class JSDebug
                 $content = self::getJsFromPage($type, $session);
             }
 
-            if (!empty(self::$trackJs['trim'])) {
-                $trimLength = self::$trackJs['trim'];
-                $content = self::trimArrayMessages($content, $trimLength);
+            if (!empty(self::$trackJs['trim']) && \is_int(self::$trackJs['trim'])) {
+                $content = self::trimArrayMessages($content, self::$trackJs['trim']);
             }
         } catch (UnsupportedDriverActionException $e) {
             // ignore...
@@ -63,10 +66,8 @@ class JSDebug
         return $content;
     }
 
-    /**
-     * @return array
-     */
-    private static function getJSFromPage($type, Session $session)
+    /** @return array<string> */
+    private static function getJSFromPage(string $type, Session $session)
     {
         $var = \sprintf('window.js%s', ucfirst($type));
 
@@ -76,15 +77,19 @@ class JSDebug
 
         $errors = $session->evaluateScript('return '.$var);
 
-        return empty($errors) ? [] : $errors;
+        if (!\is_array($errors) || empty($errors)) {
+            return [];
+        }
+
+        return array_map(static fn (mixed $v): string => \is_scalar($v) ? (string) $v : '', $errors);
     }
 
     /**
-     * @param int $length
+     * @param array<string> $messages
      *
-     * @return array
+     * @return array<string>
      */
-    private static function trimArrayMessages(array $messages, $length)
+    private static function trimArrayMessages(array $messages, int $length)
     {
         array_walk($messages, static function (&$msg) use ($length) {
             $msg = substr($msg, 0, $length);

@@ -14,24 +14,36 @@ use FailAid\Service\StaticCallerService;
  */
 class Initializer implements ContextInitializer
 {
+    /** @var array<string, mixed> */
     public array $screenshot;
 
+    /** @var array<string, string> */
     public array $siteFilters;
 
+    /** @var array<string, string> */
     public array $debugBarSelectors;
 
+    /** @var array<string, mixed> */
     public array $trackJs;
 
-    public $defaultSession;
+    public ?string $defaultSession;
 
+    /** @var array<string, mixed> */
     public array $output;
 
+    /**
+     * @param array<string, mixed>  $screenshot
+     * @param array<string, string> $siteFilters
+     * @param array<string, string> $debugBarSelectors
+     * @param array<string, mixed>  $trackJs
+     * @param array<string, mixed>  $output
+     */
     public function __construct(
         array $screenshot,
         array $siteFilters = [],
         array $debugBarSelectors = [],
         array $trackJs = [],
-        $defaultSession = null,
+        ?string $defaultSession = null,
         array $output = [],
     ) {
         $this->screenshot = $screenshot;

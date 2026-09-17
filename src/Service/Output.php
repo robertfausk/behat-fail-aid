@@ -4,36 +4,46 @@ declare(strict_types=1);
 
 namespace FailAid\Service;
 
+use Behat\Behat\Hook\Scope\ScenarioScope;
+
 /**
  * Output class.
  */
 class Output
 {
-    private static $output = [];
+    /** @var array<string, mixed> */
+    private static array $output = [];
 
+    /** @param array<string, mixed> $options */
     public static function setOptions(array $options): void
     {
         self::$output = $options;
     }
 
-    public static function getOptions()
+    /** @return array<string, mixed> */
+    public static function getOptions(): array
     {
         return self::$output;
     }
 
+    /**
+     * @param array<string>|null $jsErrors
+     * @param array<string>|null $jsLogs
+     * @param array<string>|null $jsWarns
+     */
     public static function getExceptionDetails(
-        $currentUrl,
-        $statusCode,
-        $featureFile,
-        $contextFile,
-        $screenshotPath,
-        $debugBarDetails,
-        $jsErrors,
-        $jsLogs,
-        $jsWarns,
-        $driver,
-        $scenario,
-    ) {
+        ?string $currentUrl,
+        int|string|null $statusCode,
+        ?string $featureFile,
+        ?string $contextFile,
+        ?string $screenshotPath,
+        ?string $debugBarDetails,
+        ?array $jsErrors,
+        ?array $jsLogs,
+        ?array $jsWarns,
+        ?string $driver,
+        ?ScenarioScope $scenario,
+    ): string {
         $message = \PHP_EOL.\PHP_EOL;
         if (self::getOption('url')) {
             $message .= '[URL] '.$currentUrl.\PHP_EOL;
@@ -47,7 +57,7 @@ class Output
             $message .= '[FEATURE] '.$featureFile.\PHP_EOL;
         }
 
-        if (self::getOption('tags')) {
+        if (self::getOption('tags') && null !== $scenario) {
             $message .= '[TAGS] '.implode(', ', $scenario->getScenario()->getTags()).\PHP_EOL;
         }
 
@@ -63,7 +73,7 @@ class Output
             $message .= '[DRIVER] '.$driver.\PHP_EOL;
         }
 
-        if (self::getOption('rerun')) {
+        if (self::getOption('rerun') && null !== $scenario) {
             $message .= '[RERUN] '
                 .'./vendor/bin/behat '
                 .$featureFile
@@ -93,7 +103,7 @@ class Output
         return $message;
     }
 
-    public static function getOption($key)
+    public static function getOption(string $key): mixed
     {
         if (!isset(self::$output[$key])) {
             throw new \Exception("Undefined output option '$key' provided.");
@@ -102,7 +112,7 @@ class Output
         return self::$output[$key];
     }
 
-    public static function setOption($key, $value): void
+    public static function setOption(string $key, mixed $value): void
     {
         self::$output[$key] = $value;
     }

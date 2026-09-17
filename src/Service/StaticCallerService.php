@@ -9,8 +9,12 @@ namespace FailAid\Service;
  */
 class StaticCallerService
 {
-    public function call($class, $function, array $params = [])
+    /**
+     * @param array<mixed> $params
+     */
+    public function call(string $class, string $function, array $params = []): mixed
     {
-        return \call_user_func_array("$class::$function", $params);
+        /* @phpstan-ignore argument.type */
+        return \call_user_func_array([$class, $function], $params);
     }
 }

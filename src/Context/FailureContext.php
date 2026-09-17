@@ -158,6 +158,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
         $session = $this->getSession();
         try {
             $this->staticCaller->call(Screenshot::class, 'canTakeScreenshot', [$session]);
+            /** @var string $screenshotPath */
             $screenshotPath = $this->staticCaller->call(Screenshot::class, 'takeScreenshot', [
                 $session->getPage(),
                 $session->getDriver(),
@@ -190,7 +191,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
      *
      * Load the config file again as the context params aren't available until the context is initialised.
      */
-    public static function autoCleanBeforeTestExecution($arg1): void
+    public static function autoCleanBeforeTestExecution(mixed $arg1): void
     {
         if (self::$cleaned) {
             return;
@@ -199,17 +200,26 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
         $configPath = self::getConfigFilePath();
         $config = (new ConfigurationLoader('BEHAT_PARAMS', $configPath))->loadConfiguration();
 
-        if (!isset($config[0]['extensions']['FailAid\\Extension']['screenshot'])) {
+        $firstConfig = $config[0] ?? null;
+        if (!\is_array($firstConfig)) {
             return;
         }
 
-        $screenshotConfig = $config[0]['extensions']['FailAid\\Extension']['screenshot'];
+        /** @var array<string, array<string, array<string, mixed>>> $extensions */
+        $extensions = $firstConfig['extensions'] ?? [];
+        if (!isset($extensions['FailAid\\Extension']['screenshot'])) {
+            return;
+        }
+
+        $screenshotConfig = $extensions['FailAid\\Extension']['screenshot'];
 
         if (!$screenshotConfig['autoClean'] && !self::$autoClean) {
             return;
         }
 
-        $directory = isset($screenshotConfig['directory']) ? $screenshotConfig['directory'] : sys_get_temp_dir();
+        $directory = isset($screenshotConfig['directory']) && \is_string($screenshotConfig['directory'])
+            ? $screenshotConfig['directory']
+            : sys_get_temp_dir();
         self::clearDir($directory);
 
         self::$cleaned = true;
@@ -218,7 +228,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     /**
      * @BeforeScenario
      */
-    public function currentScenario($scenarioEvent): self
+    public function currentScenario(ScenarioScope $scenarioEvent): self
     {
         $this->currentScenario = $scenarioEvent;
 
@@ -322,7 +332,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
                         ]);
                     }
 
-                    $message = $this->addStateDetails($message, $this->getStateDetails(self::$states));
+                    $message = $this->addStateDetails(\is_string($message) ? $message : null, $this->getStateDetails(self::$states));
 
                     $this->setAdditionalExceptionDetailsInException(
                         $exception,
@@ -396,7 +406,8 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     private static function getConfigFilePath(): string
     {
         $input = new ArgvInput();
-        $path = $input->getParameterOption(['-c', '--config'], 'behat.yml');
+        $pathValue = $input->getParameterOption(['-c', '--config'], 'behat.yml');
+        $path = \is_string($pathValue) ? $pathValue : 'behat.yml';
         $basePath = '';
 
         if ('/' !== substr($path, 0, 1)) {
@@ -499,6 +510,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
         $jsWarns = $this->staticCaller->call(JSDebug::class, 'getJsWarns', [$session]);
         $jsLogs = $this->staticCaller->call(JSDebug::class, 'getJsLogs', [$session]);
 
+        /** @var string $message */
         $message = $this->staticCaller->call(Output::class, 'getExceptionDetails', [
             $currentUrl,
             $statusCode,
@@ -513,7 +525,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
             $scenario,
         ]);
 
-        return (string) $message;
+        return $message;
     }
 
     public function setMink(Mink $mink): void
@@ -521,6 +533,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
         $this->mink = $mink;
     }
 
+    /** @param array<string, mixed> $parameters */
     public function setMinkParameters(array $parameters): void
     {
         $this->minkParameters = $parameters;
@@ -547,7 +560,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
         self::$states[$name] = $value;
     }
 
-    public static function getState(string $name, $default = null)
+    public static function getState(string $name, mixed $default = null): mixed
     {
         return isset(self::$states[$name]) ? self::$states[$name] : $default;
     }
@@ -564,12 +577,13 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
                 if (!isset($selector['callback'])) {
                     throw new \Exception('Debug bar selector if array must have callback specified.');
                 }
-                [$class, $method] = explode('::', $selector['callback'], 2);
+                $callback = \is_string($selector['callback']) ? $selector['callback'] : '';
+                [$class, $method] = explode('::', $callback, 2);
                 $details .= $class::$method($page);
-            } elseif ($detailText = $page->find('css', $selector)) {
+            } elseif (\is_string($selector) && ($detailText = $page->find('css', $selector))) {
                 $details .= $detailText->getText();
             } else {
-                $details .= 'Element "'.$selector.'" Not Found.';
+                $details .= 'Element "'.(\is_string($selector) ? $selector : '').'" Not Found.';
             }
             $details .= \PHP_EOL;
         }
@@ -584,7 +598,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     {
         $stateDetails = '';
         foreach ($states as $stateName => $stateValue) {
-            $stateDetails .= '  ['.strtoupper($stateName).'] '.$stateValue.\PHP_EOL;
+            $stateDetails .= '  ['.strtoupper($stateName).'] '.(\is_scalar($stateValue) ? $stateValue : '').\PHP_EOL;
         }
 
         return $stateDetails;

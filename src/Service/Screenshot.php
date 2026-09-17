@@ -62,23 +62,23 @@ class Screenshot implements ScreenshotInterface
         self::$screenshotDir = tempnam(sys_get_temp_dir(), date('Ymd-'));
         self::$screenshotMode = self::SCREENSHOT_MODE_DEFAULT;
 
-        if (isset($options['directory'])) {
-            self::$screenshotDir = realpath($options['directory']).\DIRECTORY_SEPARATOR.date('Ymd-');
+        if (isset($options['directory']) && \is_string($options['directory'])) {
+            self::$screenshotDir = (realpath($options['directory']) ?: '').\DIRECTORY_SEPARATOR.date('Ymd-');
         }
 
-        if (isset($options['mode'])) {
+        if (isset($options['mode']) && \is_string($options['mode'])) {
             self::$screenshotMode = $options['mode'];
         }
 
         if (isset($options['autoClean'])) {
-            self::$screenshotAutoClean = $options['autoClean'];
+            self::$screenshotAutoClean = (bool) $options['autoClean'];
         }
 
-        if (isset($options['size'])) {
+        if (isset($options['size']) && \is_string($options['size'])) {
             self::$screenshotSize = explode('x', $options['size'], 2);
         }
 
-        if (isset($options['hostDirectory'])) {
+        if (isset($options['hostDirectory']) && \is_string($options['hostDirectory'])) {
             self::$screenshotHostDirectory = rtrim(self::resolveEnvVarsInString($options['hostDirectory']), \DIRECTORY_SEPARATOR).
                 \DIRECTORY_SEPARATOR.
                 date('Ymd-');
@@ -86,7 +86,7 @@ class Screenshot implements ScreenshotInterface
             self::$screenshotHostDirectory = null;
         }
 
-        if (isset($options['hostUrl'])) {
+        if (isset($options['hostUrl']) && \is_string($options['hostUrl'])) {
             self::$screenshotHostUrl = rtrim(self::resolveEnvVarsInString($options['hostUrl']), \DIRECTORY_SEPARATOR).
                 \DIRECTORY_SEPARATOR.
                 date('Ymd-');

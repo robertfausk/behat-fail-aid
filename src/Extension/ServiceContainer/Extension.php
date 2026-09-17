@@ -122,6 +122,7 @@ class Extension implements ExtensionInterface
     /**
      * Loads extension services into temporary container.
      */
+    /** @param array<string, mixed> $config */
     public function load(ContainerBuilder $container, array $config): void
     {
         $container->setParameter('failaid.config.screenshot', $this->getScreenshotOptions($config));
@@ -129,15 +130,16 @@ class Extension implements ExtensionInterface
         if (!isset($config['debugBarSelectors'])) {
             $config['debugBarSelectors'] = [];
         }
-        $container->setParameter('failaid.config.debugBarSelectors', $config['debugBarSelectors']);
+        $container->setParameter('failaid.config.debugBarSelectors', (array) $config['debugBarSelectors']);
 
         if (!isset($config['siteFilters'])) {
             $config['siteFilters'] = [];
         }
-        $container->setParameter('failaid.config.siteFilters', $config['siteFilters']);
-        $container->setParameter('failaid.config.defaultSession', $config['defaultSession']);
-        $container->setParameter('failaid.config.trackJs', $config['trackJs']);
-        $container->setParameter('failaid.config.output', $config['output']);
+        $container->setParameter('failaid.config.siteFilters', (array) $config['siteFilters']);
+        $defaultSession = $config['defaultSession'] ?? null;
+        $container->setParameter('failaid.config.defaultSession', \is_string($defaultSession) ? $defaultSession : null);
+        $container->setParameter('failaid.config.trackJs', (array) $config['trackJs']);
+        $container->setParameter('failaid.config.output', (array) $config['output']);
 
         $definition = new Definition(Initializer::class, [
             '%failaid.config.screenshot%',
@@ -155,7 +157,7 @@ class Extension implements ExtensionInterface
         $this->addFeedbackOnFailureCommand($container);
     }
 
-    private function addScenarioDebugCommand($container): void
+    private function addScenarioDebugCommand(ContainerBuilder $container): void
     {
         $definition = new Definition(
             ScenarioDebugCli::class,
@@ -165,7 +167,7 @@ class Extension implements ExtensionInterface
         $container->setDefinition(CliExtension::CONTROLLER_TAG.'.failaid.scenariodebug', $definition);
     }
 
-    private function addAutoCleanCommand($container): void
+    private function addAutoCleanCommand(ContainerBuilder $container): void
     {
         $definition = new Definition(
             ClearScreenshots::class,
@@ -175,7 +177,7 @@ class Extension implements ExtensionInterface
         $container->setDefinition(CliExtension::CONTROLLER_TAG.'.failaid.clearScreenshots', $definition);
     }
 
-    private function addWaitOnFailureCommand($container): void
+    private function addWaitOnFailureCommand(ContainerBuilder $container): void
     {
         $definition = new Definition(
             WaitOnFailure::class,
@@ -185,7 +187,7 @@ class Extension implements ExtensionInterface
         $container->setDefinition(CliExtension::CONTROLLER_TAG.'.failaid.waitOnFailure', $definition);
     }
 
-    private function addFeedbackOnFailureCommand($container): void
+    private function addFeedbackOnFailureCommand(ContainerBuilder $container): void
     {
         $definition = new Definition(
             FeedbackOnFailure::class,
@@ -196,20 +198,28 @@ class Extension implements ExtensionInterface
     }
 
     /**
+     * @param array<string, mixed> $config
+     *
      * @return array<string, mixed>
      */
-    private function getScreenshotOptions(array $config)
+    private function getScreenshotOptions(array $config): array
     {
-        if (isset($config['screenshot'])) {
-            return $config['screenshot'];
+        if (isset($config['screenshot']) && \is_array($config['screenshot'])) {
+            /** @var array<string, mixed> $screenshot */
+            $screenshot = $config['screenshot'];
+
+            return $screenshot;
         }
 
         /*
          * DEPRECATED, to be removed in next major version bump.
          */
-        return [
-            'directory' => isset($config['screenshotDirectory']) ? $config['screenshotDirectory'] : null,
-            'mode' => ($config['screenshotMode']) ? $config['screenshotMode'] : null,
+        /** @var array<string, mixed> $result */
+        $result = [
+            'directory' => isset($config['screenshotDirectory']) && \is_string($config['screenshotDirectory']) ? $config['screenshotDirectory'] : null,
+            'mode' => !empty($config['screenshotMode']) && \is_string($config['screenshotMode']) ? $config['screenshotMode'] : null,
         ];
+
+        return $result;
     }
 }

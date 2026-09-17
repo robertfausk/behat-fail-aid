@@ -19,7 +19,8 @@ class WaitOnFailure implements Controller
 
     public function execute(InputInterface $input, OutputInterface $output): ?int
     {
-        if ($time = $input->getOption('wait-on-failure')) {
+        $time = $input->getOption('wait-on-failure');
+        if (is_numeric($time)) {
             FailureContext::setWaitOnFailure((int) $time);
         }
 

@@ -169,7 +169,7 @@ Info: clearly not equal.';
 
 [URL] http://site.dev/
 [STATUS] 500
-[TAGS] 
+[TAGS]
 [CONTEXT] /Assertions/WebAssert.php
 [DRIVER] Behat\Mink\Driver\DriverInterface
 

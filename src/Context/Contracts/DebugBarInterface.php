@@ -13,8 +13,7 @@ interface DebugBarInterface
 {
     /**
      * Override if gathering details is complex.
-     *
-     * @return string
      */
-    public function gatherDebugBarDetails(array $debugBarSelectors, DocumentElement $page);
+    /** @param array<string, string> $debugBarSelectors */
+    public function gatherDebugBarDetails(array $debugBarSelectors, DocumentElement $page): string;
 }
