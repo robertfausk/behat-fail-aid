@@ -12,7 +12,7 @@ sleep 1
 ./vendor/bin/phpunit -c tests
 
 # fail.feature contains 1 intentionally failing scenario run across 3 suites = 3 expected failures
-BEHAT_OUTPUT=$(./vendor/bin/behat 2>&1)
+BEHAT_OUTPUT=$(./vendor/bin/behat --no-colors 2>&1)
 echo "$BEHAT_OUTPUT"
 echo "$BEHAT_OUTPUT" | grep -q "9 scenarios (6 passed, 3 failed)" \
   || { echo "Unexpected behat scenario result!"; kill $SERVER_PID; exit 1; }
