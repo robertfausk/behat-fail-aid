@@ -394,11 +394,11 @@ Dependency matrices are managed with [g1a/composer-test-scenarios](https://githu
 Scenario lock files live in `.scenarios.lock/` and are committed to the repository.
 The root `composer.lock` is **not** tracked — CI and local runs always install from a scenario lock file.
 
-To install dependencies for a specific scenario:
+To install dependencies for a specific scenario (run inside the container):
 
 ```shell
-php composer.phar scenario behat3   # installs .scenarios.lock/behat3/composer.lock
-php composer.phar scenario behat4   # installs .scenarios.lock/behat4/composer.lock
+docker compose run php8.3 composer scenario behat3
+docker compose run php8.3 composer scenario behat4
 ```
 
 To regenerate scenario lock files after changing `composer.json`:
