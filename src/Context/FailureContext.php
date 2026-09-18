@@ -510,7 +510,6 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
         $jsWarns = $this->staticCaller->call(JSDebug::class, 'getJsWarns', [$session]);
         $jsLogs = $this->staticCaller->call(JSDebug::class, 'getJsLogs', [$session]);
 
-        /** @var string $message */
         $message = $this->staticCaller->call(Output::class, 'getExceptionDetails', [
             $currentUrl,
             $statusCode,
@@ -525,7 +524,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
             $scenario,
         ]);
 
-        return $message;
+        return is_string($message) ? $message : '';
     }
 
     public function setMink(Mink $mink): void

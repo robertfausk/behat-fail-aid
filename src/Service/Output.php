@@ -58,7 +58,8 @@ class Output
         }
 
         if (self::getOption('tags') && null !== $scenario) {
-            $message .= '[TAGS] '.implode(', ', $scenario->getScenario()->getTags()).\PHP_EOL;
+            $tags = implode(', ', $scenario->getScenario()->getTags());
+            $message .= rtrim('[TAGS] '.$tags).\PHP_EOL;
         }
 
         if (self::getOption('context')) {
