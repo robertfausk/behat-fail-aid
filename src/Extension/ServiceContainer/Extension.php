@@ -164,7 +164,7 @@ class Extension implements ExtensionInterface
             [new Reference(self::CONTEXT_INITIALISER)]
         );
         $definition->addTag(CliExtension::CONTROLLER_TAG, ['priority' => 1]);
-        $container->setDefinition(CliExtension::CONTROLLER_TAG.'.failaid.scenariodebug', $definition);
+        $container->setDefinition(CliExtension::CONTROLLER_TAG . '.failaid.scenariodebug', $definition);
     }
 
     private function addAutoCleanCommand(ContainerBuilder $container): void
@@ -174,7 +174,7 @@ class Extension implements ExtensionInterface
             [new Reference(self::CONTEXT_INITIALISER)]
         );
         $definition->addTag(CliExtension::CONTROLLER_TAG, ['priority' => 1]);
-        $container->setDefinition(CliExtension::CONTROLLER_TAG.'.failaid.clearScreenshots', $definition);
+        $container->setDefinition(CliExtension::CONTROLLER_TAG . '.failaid.clearScreenshots', $definition);
     }
 
     private function addWaitOnFailureCommand(ContainerBuilder $container): void
@@ -184,7 +184,7 @@ class Extension implements ExtensionInterface
             [new Reference(self::CONTEXT_INITIALISER)]
         );
         $definition->addTag(CliExtension::CONTROLLER_TAG, ['priority' => 1]);
-        $container->setDefinition(CliExtension::CONTROLLER_TAG.'.failaid.waitOnFailure', $definition);
+        $container->setDefinition(CliExtension::CONTROLLER_TAG . '.failaid.waitOnFailure', $definition);
     }
 
     private function addFeedbackOnFailureCommand(ContainerBuilder $container): void
@@ -194,7 +194,7 @@ class Extension implements ExtensionInterface
             [new Reference(self::CONTEXT_INITIALISER)]
         );
         $definition->addTag(CliExtension::CONTROLLER_TAG, ['priority' => 1]);
-        $container->setDefinition(CliExtension::CONTROLLER_TAG.'.failaid.feedbackOnFailure', $definition);
+        $container->setDefinition(CliExtension::CONTROLLER_TAG . '.failaid.feedbackOnFailure', $definition);
     }
 
     /**

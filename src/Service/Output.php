@@ -44,60 +44,60 @@ class Output
         ?string $driver,
         ?ScenarioScope $scenario,
     ): string {
-        $message = \PHP_EOL.\PHP_EOL;
+        $message = \PHP_EOL . \PHP_EOL;
         if (self::getOption('url')) {
-            $message .= '[URL] '.$currentUrl.\PHP_EOL;
+            $message .= '[URL] ' . $currentUrl . \PHP_EOL;
         }
 
         if (self::getOption('status')) {
-            $message .= '[STATUS] '.$statusCode.\PHP_EOL;
+            $message .= '[STATUS] ' . $statusCode . \PHP_EOL;
         }
 
         if (self::getOption('feature')) {
-            $message .= '[FEATURE] '.$featureFile.\PHP_EOL;
+            $message .= '[FEATURE] ' . $featureFile . \PHP_EOL;
         }
 
         if (self::getOption('tags') && null !== $scenario) {
             $tags = implode(', ', $scenario->getScenario()->getTags());
-            $message .= rtrim('[TAGS] '.$tags).\PHP_EOL;
+            $message .= rtrim('[TAGS] ' . $tags) . \PHP_EOL;
         }
 
         if (self::getOption('context')) {
-            $message .= '[CONTEXT] '.$contextFile.\PHP_EOL;
+            $message .= '[CONTEXT] ' . $contextFile . \PHP_EOL;
         }
 
         if (self::getOption('screenshot')) {
-            $message .= '[SCREENSHOT] '.$screenshotPath.\PHP_EOL;
+            $message .= '[SCREENSHOT] ' . $screenshotPath . \PHP_EOL;
         }
 
         if (self::getOption('driver')) {
-            $message .= '[DRIVER] '.$driver.\PHP_EOL;
+            $message .= '[DRIVER] ' . $driver . \PHP_EOL;
         }
 
         if (self::getOption('rerun') && null !== $scenario) {
             $message .= '[RERUN] '
-                .'./vendor/bin/behat '
-                .$featureFile
-                .':'
-                .$scenario->getScenario()->getLine()
-                .\PHP_EOL;
+                . './vendor/bin/behat '
+                . $featureFile
+                . ':'
+                . $scenario->getScenario()->getLine()
+                . \PHP_EOL;
         }
 
-        $glue = \PHP_EOL.'------'.\PHP_EOL;
+        $glue = \PHP_EOL . '------' . \PHP_EOL;
         if ($jsErrors) {
-            $message .= \PHP_EOL.'[JSERRORS] '.implode($glue, $jsErrors).\PHP_EOL;
+            $message .= \PHP_EOL . '[JSERRORS] ' . implode($glue, $jsErrors) . \PHP_EOL;
         }
 
         if ($jsWarns) {
-            $message .= \PHP_EOL.'[JSWARNS] '.implode($glue, $jsWarns).\PHP_EOL;
+            $message .= \PHP_EOL . '[JSWARNS] ' . implode($glue, $jsWarns) . \PHP_EOL;
         }
 
         if ($jsLogs) {
-            $message .= \PHP_EOL.'[JSLOGS] '.implode($glue, $jsLogs).\PHP_EOL;
+            $message .= \PHP_EOL . '[JSLOGS] ' . implode($glue, $jsLogs) . \PHP_EOL;
         }
 
         if ($debugBarDetails) {
-            $message .= \PHP_EOL.'[DEBUG BAR INFO]'.\PHP_EOL;
+            $message .= \PHP_EOL . '[DEBUG BAR INFO]' . \PHP_EOL;
             $message .= $debugBarDetails;
         }
 
@@ -127,9 +127,9 @@ class Output
      */
     public static function provideDiff($expected, $actual, $message = null)
     {
-        return 'Mismatch: (- expected, + actual)'.\PHP_EOL.\PHP_EOL.
-            '- '.$expected.\PHP_EOL.
-            '+ '.$actual.\PHP_EOL.\PHP_EOL.
-            'Info: '.$message;
+        return 'Mismatch: (- expected, + actual)' . \PHP_EOL . \PHP_EOL .
+            '- ' . $expected . \PHP_EOL .
+            '+ ' . $actual . \PHP_EOL . \PHP_EOL .
+            'Info: ' . $message;
     }
 }

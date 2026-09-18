@@ -20,8 +20,8 @@ jobs:
       - name: PHPStan
         run: ./vendor/bin/phpstan analyse
 
-      - name: PHP-CS-Fixer
-        run: ./vendor/bin/php-cs-fixer fix --dry-run --diff
+      - name: PHP_CodeSniffer
+        run: ./vendor/bin/phpcs
 
   tests:
     runs-on: ubuntu-latest

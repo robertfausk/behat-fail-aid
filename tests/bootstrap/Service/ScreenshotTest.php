@@ -52,7 +52,7 @@ class ScreenshotTest extends TestCase
         Screenshot::setOptions($options, $siteFilters);
 
         self::assertEquals($siteFilters, Screenshot::$siteFilters);
-        self::assertEquals($options['directory'].'/123', Screenshot::$screenshotDir);
+        self::assertEquals($options['directory'] . '/123', Screenshot::$screenshotDir);
         self::assertEquals($options['mode'], Screenshot::$screenshotMode);
         self::assertEquals($options['autoClean'], Screenshot::$screenshotAutoClean);
         self::assertEquals(['1024', '2000'], Screenshot::$screenshotSize);
@@ -155,7 +155,7 @@ class ScreenshotTest extends TestCase
         $driver = $this->getMockBuilder(Selenium2Driver::class)->getMock();
 
         $jobNumber = 99238843;
-        putenv('JOB_NUMBER='.$jobNumber);
+        putenv('JOB_NUMBER=' . $jobNumber);
 
         Screenshot::setOptions($options, $siteFilters);
         $result = Screenshot::takeScreenshot($page, $driver);

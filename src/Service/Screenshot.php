@@ -63,7 +63,7 @@ class Screenshot implements ScreenshotInterface
         self::$screenshotMode = self::SCREENSHOT_MODE_DEFAULT;
 
         if (isset($options['directory']) && \is_string($options['directory'])) {
-            self::$screenshotDir = (realpath($options['directory']) ?: '').\DIRECTORY_SEPARATOR.date('Ymd-');
+            self::$screenshotDir = (realpath($options['directory']) ?: '') . \DIRECTORY_SEPARATOR . date('Ymd-');
         }
 
         if (isset($options['mode']) && \is_string($options['mode'])) {
@@ -79,16 +79,16 @@ class Screenshot implements ScreenshotInterface
         }
 
         if (isset($options['hostDirectory']) && \is_string($options['hostDirectory'])) {
-            self::$screenshotHostDirectory = rtrim(self::resolveEnvVarsInString($options['hostDirectory']), \DIRECTORY_SEPARATOR).
-                \DIRECTORY_SEPARATOR.
+            self::$screenshotHostDirectory = rtrim(self::resolveEnvVarsInString($options['hostDirectory']), \DIRECTORY_SEPARATOR) .
+                \DIRECTORY_SEPARATOR .
                 date('Ymd-');
         } else {
             self::$screenshotHostDirectory = null;
         }
 
         if (isset($options['hostUrl']) && \is_string($options['hostUrl'])) {
-            self::$screenshotHostUrl = rtrim(self::resolveEnvVarsInString($options['hostUrl']), \DIRECTORY_SEPARATOR).
-                \DIRECTORY_SEPARATOR.
+            self::$screenshotHostUrl = rtrim(self::resolveEnvVarsInString($options['hostUrl']), \DIRECTORY_SEPARATOR) .
+                \DIRECTORY_SEPARATOR .
                 date('Ymd-');
         } else {
             self::$screenshotHostUrl = null;
@@ -132,20 +132,20 @@ class Screenshot implements ScreenshotInterface
                     $content = $driver->getScreenshot();
                     $filename .= '.png';
                 } catch (DriverException $e) {
-                    throw new \Exception('unable to produce screenshot: '.$e->getMessage());
+                    throw new \Exception('unable to produce screenshot: ' . $e->getMessage());
                 }
                 break;
         }
 
-        file_put_contents(self::$screenshotDir.$filename, $content);
+        file_put_contents(self::$screenshotDir . $filename, $content);
 
         if (self::$screenshotHostDirectory) {
-            return 'file://'.self::$screenshotHostDirectory.$filename;
+            return 'file://' . self::$screenshotHostDirectory . $filename;
         } elseif (self::$screenshotHostUrl) {
-            return self::$screenshotHostUrl.$filename;
+            return self::$screenshotHostUrl . $filename;
         }
 
-        return 'file://'.self::$screenshotDir.$filename;
+        return 'file://' . self::$screenshotDir . $filename;
     }
 
     public static function canTakeScreenshot(Session $session): bool

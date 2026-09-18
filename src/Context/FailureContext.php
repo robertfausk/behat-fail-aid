@@ -164,9 +164,9 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
                 $session->getDriver(),
             ]);
 
-            echo '[SCREENSHOT] '.$screenshotPath;
+            echo '[SCREENSHOT] ' . $screenshotPath;
         } catch (\Exception $e) {
-            echo 'Unable to take screenshot: '.$e->getMessage();
+            echo 'Unable to take screenshot: ' . $e->getMessage();
         }
     }
 
@@ -295,7 +295,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
                             try {
                                 $this->getSession()->getPage()->getHtml();
                             } catch (\WebDriver\Exception\NoSuchElement $e) {
-                                $message = \PHP_EOL.\PHP_EOL.'The page is blank, is the driver/browser ready to receive the request?';
+                                $message = \PHP_EOL . \PHP_EOL . 'The page is blank, is the driver/browser ready to receive the request?';
                             }
                         }
 
@@ -341,18 +341,18 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
                 }
 
                 if (self::$waitOnFailure) {
-                    echo \sprintf('Waiting on failure for %d seconds', self::$waitOnFailure).\PHP_EOL;
+                    echo \sprintf('Waiting on failure for %d seconds', self::$waitOnFailure) . \PHP_EOL;
                 }
 
                 if (self::$feedbackOnFailure) {
-                    echo \PHP_EOL.'-- FAIL --'.\PHP_EOL.$exception->getMessage();
+                    echo \PHP_EOL . '-- FAIL --' . \PHP_EOL . $exception->getMessage();
                     ob_flush();
                 }
 
                 return $message;
             } catch (DriverException $e) {
                 // The driver is not available, dont fail - allow behat to print out the actual error message.
-                echo 'Error message: '.$e->getMessage();
+                echo 'Error message: ' . $e->getMessage();
             }
         }
 
@@ -393,7 +393,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
         $extensions = ['png', 'html'];
         foreach (new \DirectoryIterator($directory) as $file) {
             if ($file->isFile() && \in_array($file->getExtension(), $extensions)) {
-                unlink($directory.\DIRECTORY_SEPARATOR.$file->getFilename());
+                unlink($directory . \DIRECTORY_SEPARATOR . $file->getFilename());
             }
         }
     }
@@ -411,10 +411,10 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
         $basePath = '';
 
         if ('/' !== substr($path, 0, 1)) {
-            $basePath = self::getBasePathForFile($path, (string) getcwd()).\DIRECTORY_SEPARATOR;
+            $basePath = self::getBasePathForFile($path, (string) getcwd()) . \DIRECTORY_SEPARATOR;
         }
 
-        $configFile = $basePath.$path;
+        $configFile = $basePath . $path;
 
         if (!file_exists($configFile)) {
             throw new \Exception("Autoclean: Config file '$path' not found at base path: '$basePath',
@@ -426,16 +426,16 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
 
     private static function getBasePathForFile(string $file, string $path): string
     {
-        if (!file_exists($path.\DIRECTORY_SEPARATOR.$file)) {
+        if (!file_exists($path . \DIRECTORY_SEPARATOR . $file)) {
             $chunks = explode(\DIRECTORY_SEPARATOR, $path);
 
             array_pop($chunks);
             if (!$path) {
-                throw new \Exception($file.' not found in hierarchy of directory.');
+                throw new \Exception($file . ' not found in hierarchy of directory.');
             }
 
             $path = implode(\DIRECTORY_SEPARATOR, $chunks);
-            echo $path.\PHP_EOL;
+            echo $path . \PHP_EOL;
             self::getBasePathForFile($file, $path);
         }
 
@@ -466,7 +466,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
             try {
                 $currentUrl = $session->getCurrentUrl();
             } catch (\Exception $e) {
-                $currentUrl = 'Unable to fetch current url, error: '.$e->getMessage();
+                $currentUrl = 'Unable to fetch current url, error: ' . $e->getMessage();
             }
         }
 
@@ -475,7 +475,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
             try {
                 $statusCode = $session->getStatusCode();
             } catch (DriverException $e) {
-                $statusCode = 'Unable to fetch status code, error: '.$e->getMessage();
+                $statusCode = 'Unable to fetch status code, error: ' . $e->getMessage();
             }
         }
 
@@ -488,7 +488,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
                     $driver,
                 ]);
             } catch (\Exception $e) {
-                $screenshotPath = 'Unable to produce screenshot: '.$e->getMessage();
+                $screenshotPath = 'Unable to produce screenshot: ' . $e->getMessage();
             }
         }
 
@@ -501,7 +501,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
                         $session->getPage()
                     );
                 } catch (\Exception $e) {
-                    $debugBarDetails = 'Unable to capture debug bar details: '.$e->getMessage();
+                    $debugBarDetails = 'Unable to capture debug bar details: ' . $e->getMessage();
                 }
             }
         }
@@ -571,7 +571,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     {
         $details = '';
         foreach ($debugBarSelectors as $name => $selector) {
-            $details .= '  ['.strtoupper($name).'] ';
+            $details .= '  [' . strtoupper($name) . '] ';
             if (\is_array($selector)) {
                 if (!isset($selector['callback'])) {
                     throw new \Exception('Debug bar selector if array must have callback specified.');
@@ -582,7 +582,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
             } elseif (\is_string($selector) && ($detailText = $page->find('css', $selector))) {
                 $details .= $detailText->getText();
             } else {
-                $details .= 'Element "'.(\is_string($selector) ? $selector : '').'" Not Found.';
+                $details .= 'Element "' . (\is_string($selector) ? $selector : '') . '" Not Found.';
             }
             $details .= \PHP_EOL;
         }
@@ -597,7 +597,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     {
         $stateDetails = '';
         foreach ($states as $stateName => $stateValue) {
-            $stateDetails .= '  ['.strtoupper($stateName).'] '.(\is_scalar($stateValue) ? $stateValue : '').\PHP_EOL;
+            $stateDetails .= '  [' . strtoupper($stateName) . '] ' . (\is_scalar($stateValue) ? $stateValue : '') . \PHP_EOL;
         }
 
         return $stateDetails;
@@ -606,7 +606,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     private function addStateDetails(?string $message, string $stateDetails): string
     {
         if ($stateDetails) {
-            $message .= \PHP_EOL.'[STATE]'.\PHP_EOL;
+            $message .= \PHP_EOL . '[STATE]' . \PHP_EOL;
             $message .= $stateDetails;
         }
 
@@ -619,6 +619,6 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
     {
         $reflectionObject = new \ReflectionObject($exception);
         $reflectionObjectProp = $reflectionObject->getProperty('message');
-        $reflectionObjectProp->setValue($exception, $exception->getMessage().$message);
+        $reflectionObjectProp->setValue($exception, $exception->getMessage() . $message);
     }
 }

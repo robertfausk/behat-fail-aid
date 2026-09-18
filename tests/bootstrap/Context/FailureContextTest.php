@@ -494,7 +494,7 @@ class FailureContextTest extends TestCase
         $this->testObject->setMink($minkMock);
         $result = $this->testObject->gatherStateFactsAfterFailedStep($scope);
 
-        self::assertEquals('[URL] http://site.dev/login'.\PHP_EOL, $result);
+        self::assertEquals('[URL] http://site.dev/login' . \PHP_EOL, $result);
         $this->setPrivatePropertyValue('debugBarSelectors', []);
     }
 
@@ -654,7 +654,7 @@ class FailureContextTest extends TestCase
     {
         $debugBarSelectors = [
             'xhrRequests' => [
-                'callback' => self::class.'::extract',
+                'callback' => self::class . '::extract',
             ],
         ];
 

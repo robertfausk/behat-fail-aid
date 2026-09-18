@@ -75,7 +75,7 @@ class JSDebug
             throw new \Exception(\sprintf('JS %s enabled but %s is undefined, please check implementation and on page load js errors.', $type, $var));
         }
 
-        $errors = $session->evaluateScript('return '.$var);
+        $errors = $session->evaluateScript('return ' . $var);
 
         if (!\is_array($errors) || empty($errors)) {
             return [];

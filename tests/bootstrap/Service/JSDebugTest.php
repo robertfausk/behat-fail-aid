@@ -74,7 +74,7 @@ class JSDebugTest extends TestCase
         $result = JSDebug::getJsLogs($session);
 
         self::assertIsArray($result);
-        self::assertEquals(['Unable to fetch js logs: '.$message], $result);
+        self::assertEquals(['Unable to fetch js logs: ' . $message], $result);
     }
 
     public function test_get_js_warns(): void
@@ -140,7 +140,7 @@ class JSDebugTest extends TestCase
         $result = JSDebug::getJsWarns($session);
 
         self::assertIsArray($result);
-        self::assertEquals(['Unable to fetch js warns: '.$message], $result);
+        self::assertEquals(['Unable to fetch js warns: ' . $message], $result);
     }
 
     public function test_get_js_errors(): void
@@ -206,6 +206,6 @@ class JSDebugTest extends TestCase
         $result = JSDebug::getJsErrors($session);
 
         self::assertIsArray($result);
-        self::assertEquals(['Unable to fetch js errors: '.$message], $result);
+        self::assertEquals(['Unable to fetch js errors: ' . $message], $result);
     }
 }

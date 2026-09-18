@@ -37,7 +37,7 @@ class CliControllerTest extends TestCase
     {
         $definition = new InputDefinition([new InputOption($optionName, null, $mode)]);
 
-        return new ArrayInput(['--'.$optionName => $value], $definition);
+        return new ArrayInput(['--' . $optionName => $value], $definition);
     }
 
     private function makeEmptyInput(string $optionName, int $mode = InputOption::VALUE_NONE): ArrayInput
