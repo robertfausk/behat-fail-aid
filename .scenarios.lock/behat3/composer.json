@@ -34,7 +34,7 @@
         "g1a/composer-test-scenarios": "^3",
         "matthiasnoback/symfony-config-test": "^5",
         "phpstan/phpstan": "^2.0",
-        "friendsofphp/php-cs-fixer": "^3.0"
+        "squizlabs/php_codesniffer": "^3.0"
     },
     "minimum-stability": "alpha",
     "prefer-stable": true,
@@ -51,7 +51,6 @@
     "config": {
         "allow-plugins": {
             "g1a/composer-test-scenarios": true
-        },
-        "vendor-dir": "../../vendor"
+        }
     }
 }

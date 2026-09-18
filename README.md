@@ -378,13 +378,13 @@ docker compose run --rm php8.5 ./vendor/bin/behat
 ### Static analysis
 
 ```shell
-# PHPStan (level 5)
+# PHPStan (level 9)
 make phpstan
 
-# PHP-CS-Fixer check (dry-run)
+# phpcs check (dry-run)
 make cs
 
-# PHP-CS-Fixer auto-fix
+# phpcbf auto-fix
 make cs-fix
 ```
 
@@ -392,8 +392,16 @@ make cs-fix
 
 Dependency matrices are managed with [g1a/composer-test-scenarios](https://github.com/g1a/composer-test-scenarios).
 Scenario lock files live in `.scenarios.lock/` and are committed to the repository.
+The root `composer.lock` is **not** tracked — CI and local runs always install from a scenario lock file.
 
-To regenerate after changing `composer.json`:
+To install dependencies for a specific scenario:
+
+```shell
+php composer.phar scenario behat3   # installs .scenarios.lock/behat3/composer.lock
+php composer.phar scenario behat4   # installs .scenarios.lock/behat4/composer.lock
+```
+
+To regenerate scenario lock files after changing `composer.json`:
 
 ```shell
 make scenarios-update

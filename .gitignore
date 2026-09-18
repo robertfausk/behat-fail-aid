@@ -1,5 +1,5 @@
 vendor
+composer.lock
 features/failures/*
 !features/failures/.gitkeep
-.php-cs-fixer.cache
 .phpstan/
