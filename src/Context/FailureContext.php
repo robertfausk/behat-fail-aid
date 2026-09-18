@@ -524,7 +524,7 @@ class FailureContext implements MinkAwareContext, FailStateInterface, DebugBarIn
             $scenario,
         ]);
 
-        return is_string($message) ? $message : '';
+        return \is_string($message) ? $message : '';
     }
 
     public function setMink(Mink $mink): void
